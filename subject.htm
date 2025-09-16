@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subject Database</title>
+<style>
+:root {
+  --primary: #004085;
+  --danger: #dc3545;
+  --light-grey: #f8f9fa;
+  --info: #17a2b8;
+  --medium-blue: #0069d9;
+  --success: #28a745;
+  --warning: #ffc107;
+}
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--light-grey);
+  color: var(--primary);
+}
+header {
+  background: var(--primary);
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+main {
+  display: flex;
+  min-height: 100vh;
+}
+aside {
+  width: 280px;
+  background: #e9ecef;
+  padding: 20px;
+}
+aside h3 {
+  margin-top: 0;
+  color: var(--primary);
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+aside label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  color: var(--primary);
+}
+aside select, aside input {
+  width: 100%;
+  padding: 7px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--primary);
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+aside button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  color: white;
+  transition: background 0.3s;
+}
+#addBtn { background: var(--info); }
+#addBtn:hover { background: #138496; }
+#saveBtn { background: var(--primary); }
+#saveBtn:hover { background: #0056b3; }
+#viewDbBtn { background: var(--medium-blue); }
+#viewDbBtn:hover { background: var(--primary); }
+#exportBtn { background: var(--success); }
+#exportBtn:hover { background: #218838; }
+#clearBtn { background: var(--danger); }
+#clearBtn:hover { background: #c82333; }
+
+.stats-box {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.stats-box h4 {
+  margin: 0 0 10px 0;
+  color: var(--primary);
+}
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+section {
+  flex: 1;
+  padding: 25px;
+}
+section h2 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+.search-box {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+}
+.search-box input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+}
+.search-box button {
+  padding: 8px 15px;
+  background: var(--info);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Subjects Table */
+#subjectsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+#subjectsTable thead tr {
+  background: var(--light-grey);
+}
+#subjectsTable th, #subjectsTable td {
+  text-align: left;
+  padding: 10px;
+  font-size: 14px;
+  color: var(--primary);
+}
+#subjectsTable tbody tr {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,64,133,0.1);
+  border-radius: 8px;
+}
+.actions button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.editBtn { background: var(--info); color: white; }
+.delBtn { background: var(--danger); color: white; }
+
+.bulk-actions {
+  margin: 10px 0;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+}
+.bulk-actions button {
+  margin-right: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* Database Popup */
+#dbOverlay {
+  display: none;
+  position: fixed;
+  top:0; left:0; right:0; bottom:0;
+  background: var(--light-grey);
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 20px;
+}
+#dbBox {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  color: var(--primary);
+}
+#dbBox h2 {
+  margin-top: 0;
+  text-align: center;
+  color: var(--primary);
+}
+#dbClose {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 10px;
+}
+#goToTimetable {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+#dbContent {
+  margin-top: 15px;
+}
+.year-folder {
+  margin-bottom: 20px;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  background: white;
+}
+.folder-header {
+  background: var(--primary);
+  color: white;
+  padding: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.folder-header:hover {
+  background: #0056b3;
+}
+.folder-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 15px;
+}
+.db-section {
+  flex: 1 1 220px;
+  max-width: 250px;
+  background: linear-gradient(135deg,#e0f0ff,#ffffff);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,64,133,0.2);
+  font-size: 13px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--primary);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.db-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0,64,133,0.3);
+}
+.db-section h3 {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+  color: white;
+  background: var(--primary);
+  padding: 5px;
+  border-radius: 6px 6px 0 0;
+  text-align: center;
+}
+.db-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+}
+.db-section table th,
+.db-section table td {
+  border: 1px solid #ccc;
+  padding: 4px 6px;
+  font-size: 12px;
+  color: var(--primary);
+  text-align: left;
+}
+.db-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.db-actions button {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.useBtn { background: var(--primary); color: white; }
+.delBtn { background: var(--danger); color: white; }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  background: var(--primary);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  display: none;
+  z-index: 2000;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <a href="page.htm" style="color: white; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 14px;">← Back</a>
+    <span>📘 Subject Database</span>
+    <div style="width: 80px;"></div>
+  </div>
+</header>
+<main>
+  <aside>
+    <h3>Controls</h3>
+    <label>Academic Year:</label>
+    <input type="text" id="academicYearInput" placeholder="e.g. 2024-25">
+
+    <label>Year:</label>
+    <select id="yearSelect">
+      <option value="">--Select--</option>
+      <option>1</option><option>2</option>
+      <option>3</option><option>4</option>
+    </select>
+
+    <label>Semester:</label>
+    <select id="semesterSelect">
+      <option value="">--Select--</option>
+    </select>
+
+    <label>Subject Name:</label>
+    <input type="text" id="subjectInput" placeholder="Enter subject">
+
+    <label>Credits:</label>
+    <input type="number" id="creditsInput" min="1" max="6" value="1" placeholder="Credits">
+
+    <label>Type:</label>
+    <select id="typeInput">
+      <option value="theory">Theory</option>
+      <option value="lab">Lab (2 consecutive hours)</option>
+      <option value="mcq">MCQ</option>
+      <option value="free">Free</option>
+    </select>
+
+    <button id="addBtn">Add Subject</button>
+    <button id="saveBtn">💾 Save Database</button>
+    <button id="viewDbBtn">📂 View Database</button>
+    <button id="exportBtn">📤 Export Data</button>
+    <button id="clearBtn">🗑️ Clear All</button>
+
+    <div class="stats-box">
+      <h4>Statistics</h4>
+      <div class="stat-item">
+        <span>Academic Years:</span>
+        <span id="totalYears">0</span>
+      </div>
+      <div class="stat-item">
+        <span>Total Subjects:</span>
+        <span id="totalSubjects">0</span>
+      </div>
+      <div class="stat-item">
+        <span>Current:</span>
+        <span id="currentSubjects">0</span>
+      </div>
+    </div>
+  </aside>
+  
+  <section>
+    <h2>Subjects List</h2>
+    
+    <div class="bulk-actions">
+      <button id="selectAllBtn" style="background: var(--info); color: white;">Select All</button>
+      <button id="clearSelectionBtn" style="background: var(--warning); color: var(--primary);">Clear Selection</button>
+      <button id="deleteSelectedBtn" style="background: var(--danger); color: white;">Delete Selected</button>
+      <span id="selectedCount">0 selected</span>
+    </div>
+
+    <table id="subjectsTable">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="masterCheckbox"></th>
+          <th>Subject</th>
+          <th>Credits</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<!-- Database Popup -->
+<div id="dbOverlay">
+  <div id="dbBox">
+    <button id="dbClose">Close</button>
+    <button id="goToTimetable">🎓 Go to Timetable Generator</button>
+    <h2>📂 Stored Database</h2>
+    <div id="dbContent"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const academicYearInput = document.getElementById('academicYearInput');
+const yearSelect = document.getElementById('yearSelect');
+const semesterSelect = document.getElementById('semesterSelect');
+const subjectInput = document.getElementById('subjectInput');
+const addBtn = document.getElementById('addBtn');
+const saveBtn = document.getElementById('saveBtn');
+const viewDbBtn = document.getElementById('viewDbBtn');
+const exportBtn = document.getElementById('exportBtn');
+const clearBtn = document.getElementById('clearBtn');
+const selectAllBtn = document.getElementById('selectAllBtn');
+const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+const masterCheckbox = document.getElementById('masterCheckbox');
+const subjectsTable = document.querySelector('#subjectsTable tbody');
+const dbOverlay = document.getElementById('dbOverlay');
+const dbClose = document.getElementById('dbClose');
+const dbContent = document.getElementById('dbContent');
+const toast = document.getElementById('toast');
+
+let subjectsData = JSON.parse(localStorage.getItem('subjectsData')||'{}');
+let currentAcademicYear = '', currentYear = '', currentSemester = '', currentSubjects = [];
+let filteredSubjects = [];
+let selectedSubjects = new Set();
+
+updateStats();
+
+yearSelect.onchange = () => {
+  currentYear = yearSelect.value;
+  const semesterOptions = { '1':['1','2'], '2':['3','4'], '3':['5','6'], '4':['7','8'] };
+  semesterSelect.innerHTML = '<option value="">--Select--</option>';
+  if(semesterOptions[currentYear]){
+    semesterOptions[currentYear].forEach(sem=>{
+      const option = document.createElement('option');
+      option.value = sem;
+      option.textContent = sem;
+      semesterSelect.appendChild(option);
+    });
+  }
+  currentSemester = '';
+  currentSubjects = [];
+  renderTable();
+  updateStats();
+};
+
+semesterSelect.onchange = () => {
+  currentSemester = semesterSelect.value;
+  currentAcademicYear = academicYearInput.value.trim();
+  if(currentAcademicYear && currentYear && currentSemester &&
+     subjectsData[currentAcademicYear] &&
+     subjectsData[currentAcademicYear][currentYear] &&
+     subjectsData[currentAcademicYear][currentYear][currentSemester]){
+    currentSubjects = subjectsData[currentAcademicYear][currentYear][currentSemester];
+  } else currentSubjects = [];
+  renderTable();
+  updateStats();
+};
+
+function renderTable(){
+  subjectsTable.innerHTML = '';
+  selectedSubjects.clear();
+  filteredSubjects = currentSubjects;
+  
+  filteredSubjects.forEach((sub,i)=>{
+    const tr = document.createElement('tr');
+    const name = typeof sub === 'object' ? escapeHtml(sub.name) : escapeHtml(sub);
+    const credits = typeof sub === 'object' ? (sub.credits || 1) : 1;
+    const type = typeof sub === 'object' ? (sub.type || 'theory') : 'theory';
+    
+    tr.innerHTML = `
+      <td><input type="checkbox" class="subject-checkbox" data-i="${i}"></td>
+      <td>${name}</td>
+      <td>${credits}</td>
+      <td style="width:80px"><span style="background:var(--info);color:white;padding:2px 6px;border-radius:4px;font-size:11px;display:inline-block;width:60px;text-align:center">${type}</span></td>
+      <td class="actions">
+        <button class="editBtn" data-i="${i}">Edit</button>
+        <button class="delBtn" data-i="${i}">Delete</button>
+      </td>
+    `;
+    subjectsTable.appendChild(tr);
+  });
+  attachRowEvents();
+  updateSelectionCount();
+}
+
+function attachRowEvents(){
+  document.querySelectorAll('.editBtn').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=btn.dataset.i;
+      const originalIndex = currentSubjects.indexOf(filteredSubjects[i]);
+      const subject = filteredSubjects[i];
+      const currentName = subject.name || subject;
+      const currentCredits = subject.credits || 1;
+      const currentType = subject.type || 'theory';
+      
+      // Create edit form
+      const editForm = document.createElement('div');
+      editForm.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:1000;color:var(--primary)';
+      editForm.innerHTML = `
+        <h3 style="margin:0 0 15px;color:var(--primary)">Edit Subject</h3>
+        <label style="display:block;margin:8px 0 4px;font-weight:bold">Subject Name:</label>
+        <input id="editName" value="${escapeHtml(currentName)}" style="width:100%;padding:8px;border:1px solid var(--primary);border-radius:4px;margin-bottom:10px">
+        <label style="display:block;margin:8px 0 4px;font-weight:bold">Credits:</label>
+        <input id="editCredits" type="number" min="1" max="6" value="${currentCredits}" style="width:100%;padding:8px;border:1px solid var(--primary);border-radius:4px;margin-bottom:10px">
+        <label style="display:block;margin:8px 0 4px;font-weight:bold">Type:</label>
+        <select id="editType" style="width:100%;padding:8px;border:1px solid var(--primary);border-radius:4px;margin-bottom:15px">
+          <option value="theory" ${currentType==='theory'?'selected':''}>Theory</option>
+          <option value="lab" ${currentType==='lab'?'selected':''}>Lab (2 consecutive hours)</option>
+          <option value="mcq" ${currentType==='mcq'?'selected':''}>MCQ</option>
+          <option value="free" ${currentType==='free'?'selected':''}>Free</option>
+        </select>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button id="cancelEdit" style="padding:8px 16px;background:var(--danger);color:white;border:none;border-radius:4px;cursor:pointer">Cancel</button>
+          <button id="saveEdit" style="padding:8px 16px;background:var(--primary);color:white;border:none;border-radius:4px;cursor:pointer">Save</button>
+        </div>
+      `;
+      
+      document.body.appendChild(editForm);
+      
+      document.getElementById('cancelEdit').onclick = () => document.body.removeChild(editForm);
+      document.getElementById('saveEdit').onclick = () => {
+        const newName = document.getElementById('editName').value.trim();
+        const newCredits = parseInt(document.getElementById('editCredits').value) || 1;
+        const newType = document.getElementById('editType').value;
+        
+        if(newName){
+          if(typeof currentSubjects[originalIndex] === 'object'){
+            currentSubjects[originalIndex].name = newName;
+            currentSubjects[originalIndex].credits = newCredits;
+            currentSubjects[originalIndex].type = newType;
+          } else {
+            currentSubjects[originalIndex] = {name: newName, credits: newCredits, type: newType};
+          }
+          renderTable();
+          showToast("Subject updated","#28a745");
+        }
+        document.body.removeChild(editForm);
+      };
+    };
+  });
+  
+  document.querySelectorAll('.delBtn').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=btn.dataset.i;
+      const originalIndex = currentSubjects.indexOf(filteredSubjects[i]);
+      const subjectName = filteredSubjects[i].name || filteredSubjects[i];
+      if(confirm(`Delete "${subjectName}" permanently?`)){
+        currentSubjects.splice(originalIndex,1);
+        renderTable();
+        showToast("Subject deleted","#dc3545");
+      }
+    };
+  });
+
+  document.querySelectorAll('.subject-checkbox').forEach(checkbox=>{
+    checkbox.onchange=()=>{
+      const i = checkbox.dataset.i;
+      if(checkbox.checked){
+        selectedSubjects.add(i);
+      } else {
+        selectedSubjects.delete(i);
+      }
+      updateSelectionCount();
+    };
+  });
+}
+
+// Bulk operations
+selectAllBtn.onclick = () => {
+  document.querySelectorAll('.subject-checkbox').forEach(cb => {
+    cb.checked = true;
+    selectedSubjects.add(cb.dataset.i);
+  });
+  masterCheckbox.checked = true;
+  updateSelectionCount();
+};
+
+clearSelectionBtn.onclick = () => {
+  document.querySelectorAll('.subject-checkbox').forEach(cb => cb.checked = false);
+  selectedSubjects.clear();
+  masterCheckbox.checked = false;
+  updateSelectionCount();
+};
+
+deleteSelectedBtn.onclick = () => {
+  if(selectedSubjects.size === 0){
+    showToast("No subjects selected","#dc3545");
+    return;
+  }
+  if(confirm(`Delete ${selectedSubjects.size} selected subjects?`)){
+    const indicesToDelete = Array.from(selectedSubjects).map(i => 
+      currentSubjects.indexOf(filteredSubjects[i])
+    ).sort((a,b) => b-a);
+    
+    indicesToDelete.forEach(index => currentSubjects.splice(index, 1));
+    renderTable();
+    showToast(`${selectedSubjects.size} subjects deleted`,"#dc3545");
+  }
+};
+
+masterCheckbox.onchange = () => {
+  if(masterCheckbox.checked){
+    selectAllBtn.click();
+  } else {
+    clearSelectionBtn.click();
+  }
+};
+
+function updateSelectionCount(){
+  document.getElementById('selectedCount').textContent = `${selectedSubjects.size} selected`;
+}
+
+addBtn.onclick=()=>{
+  currentAcademicYear = academicYearInput.value.trim();
+  if(!currentAcademicYear){ showToast("Enter Academic Year","#dc3545"); return; }
+  if(!currentYear || !currentSemester){ showToast("Select Year & Semester","#dc3545"); return; }
+  if(subjectInput.value.trim()===''){ showToast("Enter subject name","#dc3545"); return; }
+  
+  const subjectName = subjectInput.value.trim();
+  const credits = parseInt(document.getElementById('creditsInput').value) || 1;
+  const type = document.getElementById('typeInput').value;
+  
+  const exists = currentSubjects.some(sub => {
+    const name = sub.name || sub;
+    return name.toLowerCase() === subjectName.toLowerCase();
+  });
+  
+  if(exists){
+    showToast("Subject already exists","#dc3545");
+    return;
+  }
+  
+  currentSubjects.push({name:subjectName, credits:credits, type:type});
+  subjectInput.value='';
+  document.getElementById('creditsInput').value='1';
+  document.getElementById('typeInput').value='theory';
+  renderTable();
+  updateStats();
+  showToast("Subject added","#28a745");
+};
+
+saveBtn.onclick=()=>{
+  currentAcademicYear = academicYearInput.value.trim();
+  if(!currentAcademicYear){ showToast("Enter Academic Year","#dc3545"); return; }
+  if(!currentYear || !currentSemester){ showToast("Select Year & Semester","#dc3545"); return; }
+  if(!subjectsData[currentAcademicYear]) subjectsData[currentAcademicYear]={};
+  if(!subjectsData[currentAcademicYear][currentYear]) subjectsData[currentAcademicYear][currentYear]={};
+  subjectsData[currentAcademicYear][currentYear][currentSemester]=currentSubjects;
+  localStorage.setItem('subjectsData', JSON.stringify(subjectsData));
+  updateStats();
+  showToast("Database saved","#28a745");
+};
+
+// Export functionality
+exportBtn.onclick = () => {
+  if(Object.keys(subjectsData).length === 0){
+    showToast("No data to export","#dc3545");
+    return;
+  }
+  const dataStr = JSON.stringify(subjectsData, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `subjects_${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("Data exported","#28a745");
+};
+
+// Clear all data
+clearBtn.onclick = () => {
+  if(confirm("Clear all data permanently?")){
+    subjectsData = {};
+    currentSubjects = [];
+    localStorage.removeItem('subjectsData');
+    renderTable();
+    updateStats();
+    showToast("All data cleared","#dc3545");
+  }
+};
+
+function updateStats(){
+  const totalYears = Object.keys(subjectsData).length;
+  let totalSubjects = 0;
+  
+  for(const ay in subjectsData){
+    for(const y in subjectsData[ay]){
+      for(const s in subjectsData[ay][y]){
+        totalSubjects += subjectsData[ay][y][s].length;
+      }
+    }
+  }
+  
+  document.getElementById('totalYears').textContent = totalYears;
+  document.getElementById('totalSubjects').textContent = totalSubjects;
+  document.getElementById('currentSubjects').textContent = currentSubjects.length;
+}
+
+// Fixed View Database functionality
+viewDbBtn.addEventListener('click', function(){
+  // Reload data from localStorage to ensure we have the latest
+  subjectsData = JSON.parse(localStorage.getItem('subjectsData')||'{}');
+  
+  dbContent.innerHTML='';
+  
+  if(Object.keys(subjectsData).length===0){
+    dbContent.innerHTML='<p style="text-align:center;padding:20px;font-size:16px;color:#666;">No data saved yet. Add subjects and save to see them here.</p>';
+  } else {
+    for(const ay in subjectsData){
+      const yearFolder = document.createElement('div');
+      yearFolder.className = 'year-folder';
+      
+      const folderHeader = document.createElement('div');
+      folderHeader.className = 'folder-header';
+      folderHeader.innerHTML = `📁 ${ay}`;
+      
+      const folderContent = document.createElement('div');
+      folderContent.className = 'folder-content';
+      folderContent.style.display = 'none';
+      
+      folderHeader.addEventListener('click', function(){
+        if(folderContent.style.display === 'none'){
+          folderContent.style.display = 'flex';
+          folderHeader.innerHTML = `📂 ${ay}`;
+        } else {
+          folderContent.style.display = 'none';
+          folderHeader.innerHTML = `📁 ${ay}`;
+        }
+      });
+      
+      for(const y in subjectsData[ay]){
+        for(const s in subjectsData[ay][y]){
+          const list=subjectsData[ay][y][s];
+          if(list && list.length > 0){
+            const section=document.createElement('div');
+            section.className="db-section";
+            section.innerHTML=`
+              <h3>Year ${y} - Semester ${s} (${list.length} subjects)</h3>
+              <table>
+                <tr><th>Subject</th><th>Credits</th><th>Type</th></tr>
+                ${list.map(sub=>{
+                  const name = escapeHtml(sub.name || sub);
+                  const credits = sub.credits || 1;
+                  const type = sub.type || 'theory';
+                  return `<tr><td>${name}</td><td>${credits}</td><td>${type}</td></tr>`;
+                }).join('')}
+              </table>
+              <div class="db-actions">
+                <button class="useBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">✅ Use</button>
+                <button class="delBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">🗑️ Delete</button>
+              </div>
+            `;
+            folderContent.appendChild(section);
+          }
+        }
+      }
+      
+      yearFolder.appendChild(folderHeader);
+      yearFolder.appendChild(folderContent);
+      dbContent.appendChild(yearFolder);
+    }
+    
+    // Attach event listeners to Use and Delete buttons
+    dbContent.querySelectorAll('.useBtn').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
+        const subjects = subjectsData[ay][y][s] || [];
+        
+        if(new URLSearchParams(window.location.search).get('from') === 'timetable' && window.opener){
+          window.opener.postMessage({
+            type: 'SUBJECTS_SELECTED',
+            subjects: subjects
+          }, '*');
+          showToast(`Sent ${subjects.length} subjects to timetable`,"#28a745");
+          setTimeout(() => window.close(), 1000);
+        } else {
+          academicYearInput.value=ay;
+          yearSelect.value=y; yearSelect.onchange();
+          semesterSelect.value=s; semesterSelect.onchange();
+          dbOverlay.style.display='none';
+          showToast(`Loaded ${ay} Year ${y}, Sem ${s}`,"#28a745");
+        }
+      });
+    });
+    
+    dbContent.querySelectorAll('.delBtn').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
+        if(confirm(`Delete ${ay} Year ${y}, Sem ${s}?`)){
+          delete subjectsData[ay][y][s];
+          if(Object.keys(subjectsData[ay][y]).length===0) delete subjectsData[ay][y];
+          if(Object.keys(subjectsData[ay]).length===0) delete subjectsData[ay];
+          localStorage.setItem('subjectsData', JSON.stringify(subjectsData));
+          btn.closest('.db-section').remove();
+          updateStats();
+          showToast(`Deleted ${ay} Year ${y}, Sem ${s}`,"#dc3545");
+        }
+      });
+    });
+  }
+  
+  dbOverlay.style.display='block';
+});
+
+dbClose.addEventListener('click', function(){
+  dbOverlay.style.display='none';
+});
+
+document.getElementById('goToTimetable').addEventListener('click', function(){
+  window.open('timetable.htm', '_blank');
+});
+
+function showToast(msg,color){
+  toast.textContent=msg;
+  toast.style.background=color;
+  toast.style.display='block';
+  setTimeout(()=>toast.style.display='none',2000);
+}
+
+function escapeHtml(txt){
+  if(!txt) return '';
+  return txt.toString().replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+</script>
+</body>
+</html>
