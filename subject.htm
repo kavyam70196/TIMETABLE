@@ -17,57 +17,64 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--light-grey);
+  background: linear-gradient(135deg, rgba(248,249,250,0.95) 0%, rgba(233,236,239,0.9) 100%);
   color: var(--primary);
+  height: 100vh;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 header {
   background: var(--primary);
   color: white;
-  padding: 15px;
+  padding: 10px;
   text-align: center;
   font-size: 22px;
   font-weight: bold;
+  flex-shrink: 0;
 }
 main {
   display: flex;
-  min-height: 100vh;
+  height: calc(100vh - 60px);
+  overflow: hidden;
 }
 aside {
   width: 280px;
   background: #e9ecef;
-  padding: 20px;
+  padding: 15px;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 aside h3 {
   margin-top: 0;
   color: var(--primary);
   font-size: 18px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 aside label {
   font-weight: bold;
   margin-bottom: 5px;
   display: block;
   color: var(--primary);
+  font-size: 16px;
 }
 aside select, aside input {
   width: 100%;
-  padding: 7px;
+  padding: 8px;
   font-size: 14px;
   border-radius: 6px;
   border: 1px solid var(--primary);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: var(--primary);
 }
 aside button {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   border-radius: 6px;
   border: none;
   font-size: 14px;
   cursor: pointer;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   color: white;
-  transition: background 0.3s;
 }
 #addBtn { background: var(--info); }
 #addBtn:hover { background: #138496; }
@@ -82,9 +89,9 @@ aside button {
 
 .stats-box {
   background: white;
-  padding: 15px;
+  padding: 10px;
   border-radius: 8px;
-  margin: 15px 0;
+  margin: 10px 0;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .stats-box h4 {
@@ -95,37 +102,19 @@ aside button {
   display: flex;
   justify-content: space-between;
   margin: 5px 0;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 section {
   flex: 1;
-  padding: 25px;
+  padding: 15px;
+  overflow-y: auto;
+  height: 100%;
 }
 section h2 {
   font-size: 20px;
   color: var(--primary);
-  margin-bottom: 15px;
-}
-
-.search-box {
-  margin-bottom: 15px;
-  display: flex;
-  gap: 10px;
-}
-.search-box input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid var(--primary);
-  border-radius: 6px;
-}
-.search-box button {
-  padding: 8px 15px;
-  background: var(--info);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  margin-bottom: 10px;
 }
 
 /* Subjects Table */
@@ -139,7 +128,7 @@ section h2 {
 }
 #subjectsTable th, #subjectsTable td {
   text-align: left;
-  padding: 10px;
+  padding: 8px;
   font-size: 14px;
   color: var(--primary);
 }
@@ -150,9 +139,9 @@ section h2 {
 }
 .actions button {
   margin-right: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .editBtn { background: var(--info); color: white; }
 .delBtn { background: var(--danger); color: white; }
@@ -165,11 +154,11 @@ section h2 {
 }
 .bulk-actions button {
   margin-right: 10px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* Database Popup */
@@ -241,29 +230,25 @@ section h2 {
   padding: 15px;
 }
 .db-section {
-  flex: 1 1 220px;
-  max-width: 250px;
+  flex: 1 1 180px;
+  max-width: 200px;
   background: linear-gradient(135deg,#e0f0ff,#ffffff);
-  padding: 10px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,64,133,0.2);
-  font-size: 13px;
-  max-height: 300px;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,64,133,0.2);
+  font-size: 12px;
+  max-height: 250px;
   overflow-y: auto;
   border: 1px solid var(--primary);
-  transition: transform 0.3s, box-shadow 0.3s;
 }
-.db-section:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0,64,133,0.3);
-}
+
 .db-section h3 {
-  font-size: 14px;
-  margin: 0 0 5px 0;
+  font-size: 12px;
+  margin: 0 0 4px 0;
   color: white;
   background: var(--primary);
-  padding: 5px;
-  border-radius: 6px 6px 0 0;
+  padding: 4px;
+  border-radius: 4px 4px 0 0;
   text-align: center;
 }
 .db-section table {
@@ -274,8 +259,8 @@ section h2 {
 .db-section table th,
 .db-section table td {
   border: 1px solid #ccc;
-  padding: 4px 6px;
-  font-size: 12px;
+  padding: 3px 4px;
+  font-size: 11px;
   color: var(--primary);
   text-align: left;
 }
@@ -285,9 +270,9 @@ section h2 {
   margin-top: 6px;
 }
 .db-actions button {
-  padding: 4px 8px;
-  font-size: 12px;
-  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 11px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
 }
@@ -313,7 +298,7 @@ section h2 {
 <header>
   <div style="display: flex; align-items: center; justify-content: space-between;">
     <a href="page.htm" style="color: white; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 14px;">← Back</a>
-    <span>📘 Subject Database</span>
+    <span id="headerTitle">📘 Subject Database</span>
     <div style="width: 80px;"></div>
   </div>
 </header>
@@ -354,6 +339,7 @@ section h2 {
     <button id="viewDbBtn">📂 View Database</button>
     <button id="exportBtn">📤 Export Data</button>
     <button id="clearBtn">🗑️ Clear All</button>
+    <button id="viewTimetablesBtn" style="background: var(--warning); color: var(--primary);">📅 View Timetables</button>
 
     <div class="stats-box">
       <h4>Statistics</h4>
@@ -410,6 +396,17 @@ section h2 {
 <div id="toast"></div>
 
 <script>
+// Get department from URL or localStorage
+const urlParams = new URLSearchParams(window.location.search);
+const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+const storageKey = `subjectsData_${currentDepartment}`;
+
+let subjectsData = JSON.parse(localStorage.getItem(storageKey)||'{}');
+let currentAcademicYear = '', currentYear = '', currentSemester = '', currentSubjects = [];
+let filteredSubjects = [];
+let selectedSubjects = new Set();
+
+// DOM elements
 const academicYearInput = document.getElementById('academicYearInput');
 const yearSelect = document.getElementById('yearSelect');
 const semesterSelect = document.getElementById('semesterSelect');
@@ -423,19 +420,35 @@ const selectAllBtn = document.getElementById('selectAllBtn');
 const clearSelectionBtn = document.getElementById('clearSelectionBtn');
 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 const masterCheckbox = document.getElementById('masterCheckbox');
+const viewTimetablesBtn = document.getElementById('viewTimetablesBtn');
 const subjectsTable = document.querySelector('#subjectsTable tbody');
 const dbOverlay = document.getElementById('dbOverlay');
 const dbClose = document.getElementById('dbClose');
 const dbContent = document.getElementById('dbContent');
 const toast = document.getElementById('toast');
 
-let subjectsData = JSON.parse(localStorage.getItem('subjectsData')||'{}');
-let currentAcademicYear = '', currentYear = '', currentSemester = '', currentSubjects = [];
-let filteredSubjects = [];
-let selectedSubjects = new Set();
+// Display current department
+document.getElementById('headerTitle').textContent = `📘 Subject Database - ${currentDepartment}`;
 
-updateStats();
+// Update statistics
+function updateStats(){
+  const totalYears = Object.keys(subjectsData).length;
+  let totalSubjects = 0;
+  
+  for(const ay in subjectsData){
+    for(const y in subjectsData[ay]){
+      for(const s in subjectsData[ay][y]){
+        totalSubjects += subjectsData[ay][y][s].length;
+      }
+    }
+  }
+  
+  document.getElementById('totalYears').textContent = totalYears;
+  document.getElementById('totalSubjects').textContent = totalSubjects;
+  document.getElementById('currentSubjects').textContent = currentSubjects.length;
+}
 
+// Year selection handler
 yearSelect.onchange = () => {
   currentYear = yearSelect.value;
   const semesterOptions = { '1':['1','2'], '2':['3','4'], '3':['5','6'], '4':['7','8'] };
@@ -454,6 +467,7 @@ yearSelect.onchange = () => {
   updateStats();
 };
 
+// Semester selection handler
 semesterSelect.onchange = () => {
   currentSemester = semesterSelect.value;
   currentAcademicYear = academicYearInput.value.trim();
@@ -467,6 +481,7 @@ semesterSelect.onchange = () => {
   updateStats();
 };
 
+// Render subjects table
 function renderTable(){
   subjectsTable.innerHTML = '';
   selectedSubjects.clear();
@@ -494,6 +509,7 @@ function renderTable(){
   updateSelectionCount();
 }
 
+// Attach event listeners to table rows
 function attachRowEvents(){
   document.querySelectorAll('.editBtn').forEach(btn=>{
     btn.onclick=()=>{
@@ -504,7 +520,6 @@ function attachRowEvents(){
       const currentCredits = subject.credits || 1;
       const currentType = subject.type || 'theory';
       
-      // Create edit form
       const editForm = document.createElement('div');
       editForm.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:1000;color:var(--primary)';
       editForm.innerHTML = `
@@ -621,6 +636,7 @@ function updateSelectionCount(){
   document.getElementById('selectedCount').textContent = `${selectedSubjects.size} selected`;
 }
 
+// Add subject
 addBtn.onclick=()=>{
   currentAcademicYear = academicYearInput.value.trim();
   if(!currentAcademicYear){ showToast("Enter Academic Year","#dc3545"); return; }
@@ -647,19 +663,24 @@ addBtn.onclick=()=>{
   document.getElementById('typeInput').value='theory';
   renderTable();
   updateStats();
-  showToast("Subject added","#28a745");
+  showToast("Subject added - Click Save to store permanently","#28a745");
 };
 
+// Save database
 saveBtn.onclick=()=>{
   currentAcademicYear = academicYearInput.value.trim();
   if(!currentAcademicYear){ showToast("Enter Academic Year","#dc3545"); return; }
   if(!currentYear || !currentSemester){ showToast("Select Year & Semester","#dc3545"); return; }
+  if(currentSubjects.length === 0){ showToast("No subjects to save","#dc3545"); return; }
+  
   if(!subjectsData[currentAcademicYear]) subjectsData[currentAcademicYear]={};
   if(!subjectsData[currentAcademicYear][currentYear]) subjectsData[currentAcademicYear][currentYear]={};
   subjectsData[currentAcademicYear][currentYear][currentSemester]=currentSubjects;
-  localStorage.setItem('subjectsData', JSON.stringify(subjectsData));
+  
+  localStorage.setItem(storageKey, JSON.stringify(subjectsData));
+  
   updateStats();
-  showToast("Database saved","#28a745");
+  showToast(`Database saved for ${currentDepartment}`,"#28a745");
 };
 
 // Export functionality
@@ -673,7 +694,7 @@ exportBtn.onclick = () => {
   const url = URL.createObjectURL(dataBlob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `subjects_${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `subjects_${currentDepartment}_${new Date().toISOString().split('T')[0]}.json`;
   link.click();
   URL.revokeObjectURL(url);
   showToast("Data exported","#28a745");
@@ -681,38 +702,18 @@ exportBtn.onclick = () => {
 
 // Clear all data
 clearBtn.onclick = () => {
-  if(confirm("Clear all data permanently?")){
+  if(confirm(`Clear all data for ${currentDepartment} permanently?`)){
     subjectsData = {};
     currentSubjects = [];
-    localStorage.removeItem('subjectsData');
+    localStorage.removeItem(storageKey);
     renderTable();
     updateStats();
-    showToast("All data cleared","#dc3545");
+    showToast(`All data cleared for ${currentDepartment}`,"#dc3545");
   }
 };
 
-function updateStats(){
-  const totalYears = Object.keys(subjectsData).length;
-  let totalSubjects = 0;
-  
-  for(const ay in subjectsData){
-    for(const y in subjectsData[ay]){
-      for(const s in subjectsData[ay][y]){
-        totalSubjects += subjectsData[ay][y][s].length;
-      }
-    }
-  }
-  
-  document.getElementById('totalYears').textContent = totalYears;
-  document.getElementById('totalSubjects').textContent = totalSubjects;
-  document.getElementById('currentSubjects').textContent = currentSubjects.length;
-}
-
-// Fixed View Database functionality
-viewDbBtn.addEventListener('click', function(){
-  // Reload data from localStorage to ensure we have the latest
-  subjectsData = JSON.parse(localStorage.getItem('subjectsData')||'{}');
-  
+// View Database functionality
+viewDbBtn.onclick = () => {
   dbContent.innerHTML='';
   
   if(Object.keys(subjectsData).length===0){
@@ -724,13 +725,13 @@ viewDbBtn.addEventListener('click', function(){
       
       const folderHeader = document.createElement('div');
       folderHeader.className = 'folder-header';
-      folderHeader.innerHTML = `📁 ${ay}`;
+      folderHeader.innerHTML = `📂 ${ay}`;
       
       const folderContent = document.createElement('div');
       folderContent.className = 'folder-content';
-      folderContent.style.display = 'none';
+      folderContent.style.display = 'flex';
       
-      folderHeader.addEventListener('click', function(){
+      folderHeader.onclick = function(){
         if(folderContent.style.display === 'none'){
           folderContent.style.display = 'flex';
           folderHeader.innerHTML = `📂 ${ay}`;
@@ -738,7 +739,7 @@ viewDbBtn.addEventListener('click', function(){
           folderContent.style.display = 'none';
           folderHeader.innerHTML = `📁 ${ay}`;
         }
-      });
+      };
       
       for(const y in subjectsData[ay]){
         for(const s in subjectsData[ay][y]){
@@ -774,54 +775,115 @@ viewDbBtn.addEventListener('click', function(){
     
     // Attach event listeners to Use and Delete buttons
     dbContent.querySelectorAll('.useBtn').forEach(btn=>{
-      btn.addEventListener('click', function(){
+      btn.onclick = function(){
         const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
         const subjects = subjectsData[ay][y][s] || [];
         
-        if(new URLSearchParams(window.location.search).get('from') === 'timetable' && window.opener){
-          window.opener.postMessage({
-            type: 'SUBJECTS_SELECTED',
-            subjects: subjects
-          }, '*');
-          showToast(`Sent ${subjects.length} subjects to timetable`,"#28a745");
-          setTimeout(() => window.close(), 1000);
+        // Check if we came from timetable generator
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('fromTimetable') === 'true') {
+          // Redirect to timetable view database
+          if(window.opener){
+            window.opener.postMessage({
+              type: 'SUBJECTS_SELECTED',
+              subjects: subjects
+            }, '*');
+            setTimeout(() => window.close(), 500);
+          } else {
+            window.location.href = `timetable-new.htm?dept=${currentDepartment}&directTimetables=true`;
+          }
         } else {
+          // Load subjects locally in subject database
           academicYearInput.value=ay;
           yearSelect.value=y; yearSelect.onchange();
           semesterSelect.value=s; semesterSelect.onchange();
           dbOverlay.style.display='none';
           showToast(`Loaded ${ay} Year ${y}, Sem ${s}`,"#28a745");
         }
-      });
+      };
     });
     
     dbContent.querySelectorAll('.delBtn').forEach(btn=>{
-      btn.addEventListener('click', function(){
+      btn.onclick = function(){
         const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
         if(confirm(`Delete ${ay} Year ${y}, Sem ${s}?`)){
           delete subjectsData[ay][y][s];
           if(Object.keys(subjectsData[ay][y]).length===0) delete subjectsData[ay][y];
           if(Object.keys(subjectsData[ay]).length===0) delete subjectsData[ay];
-          localStorage.setItem('subjectsData', JSON.stringify(subjectsData));
+          localStorage.setItem(storageKey, JSON.stringify(subjectsData));
           btn.closest('.db-section').remove();
           updateStats();
           showToast(`Deleted ${ay} Year ${y}, Sem ${s}`,"#dc3545");
         }
-      });
+      };
     });
   }
   
   dbOverlay.style.display='block';
-});
+};
 
-dbClose.addEventListener('click', function(){
+// Close database overlay
+dbClose.onclick = () => {
   dbOverlay.style.display='none';
-});
+};
 
-document.getElementById('goToTimetable').addEventListener('click', function(){
-  window.open('timetable.htm', '_blank');
-});
+// View Timetables functionality
+viewTimetablesBtn.onclick = () => {
+  const timetableStorageKey = `timetableData_${currentDepartment}`;
+  const timetables = JSON.parse(localStorage.getItem(timetableStorageKey) || '{}');
+  
+  if (Object.keys(timetables).length === 0) {
+    showToast(`No timetables saved for ${currentDepartment}`, "#dc3545");
+    return;
+  }
+  
+  dbContent.innerHTML = '';
+  
+  for (const ay in timetables) {
+    const yearData = timetables[ay];
+    const yearFolder = document.createElement('div');
+    yearFolder.className = 'year-folder';
+    
+    const folderHeader = document.createElement('div');
+    folderHeader.className = 'folder-header';
+    folderHeader.innerHTML = `📂 ${ay} Timetables`;
+    
+    const folderContent = document.createElement('div');
+    folderContent.className = 'folder-content';
+    folderContent.style.display = 'flex';
+    
+    if (yearData.timetables && yearData.timetables.length > 0) {
+      yearData.timetables.forEach((tt, index) => {
+        const section = document.createElement('div');
+        section.className = 'db-section';
+        section.innerHTML = `
+          <h3>${tt.className} - ${tt.roomNumber || 'N/A'}</h3>
+          <div style="font-size: 11px; margin: 5px 0;">
+            <div><strong>Created:</strong> ${new Date(yearData.savedAt).toLocaleDateString()}</div>
+            <div><strong>Department:</strong> ${yearData.department}</div>
+          </div>
+          <div class="db-actions">
+            <button class="useBtn" onclick="window.location.href='timetable-new.htm?dept=${currentDepartment}&showTimetables=true'" style="background: var(--warning); color: var(--primary);">📚 Use</button>
+          </div>
+        `;
+        folderContent.appendChild(section);
+      });
+    }
+    
+    yearFolder.appendChild(folderHeader);
+    yearFolder.appendChild(folderContent);
+    dbContent.appendChild(yearFolder);
+  }
+  
+  dbOverlay.style.display = 'block';
+};
 
+// Go to timetable generator
+document.getElementById('goToTimetable').onclick = () => {
+  window.location.href = 'timetable-new.htm?dept=' + currentDepartment;
+};
+
+// Utility functions
 function showToast(msg,color){
   toast.textContent=msg;
   toast.style.background=color;
@@ -832,6 +894,16 @@ function showToast(msg,color){
 function escapeHtml(txt){
   if(!txt) return '';
   return txt.toString().replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+
+// Initialize
+updateStats();
+
+// Auto-show database if parameter is present
+if(urlParams.get('autoShowDb') === 'true') {
+  setTimeout(() => {
+    viewDbBtn.click();
+  }, 500);
 }
 </script>
 </body>

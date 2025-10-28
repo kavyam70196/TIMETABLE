@@ -97,11 +97,19 @@
 </head>
 <body>
   <div class="container">
-    <a href="subject.htm" class="tab">Subject Database</a>
-    <a href="timetable.htm" class="tab">Timetable Generator</a>
+    <a href="subject.htm" class="tab" id="subjectLink">Subject Database</a>
+    <a href="timetable-new.htm" class="tab" id="timetableLink">Timetable Generator</a>
   </div>
 
   <script>
+    // Get department from URL or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const dept = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
+    
+    // Update links to include department parameter
+    document.getElementById('subjectLink').href = `subject.htm?dept=${encodeURIComponent(dept)}`;
+    document.getElementById('timetableLink').href = `timetable-new.htm?dept=${encodeURIComponent(dept)}`;
+    
     for(let i=0;i<30;i++){
       const p = document.createElement('div');
       p.classList.add('particle');

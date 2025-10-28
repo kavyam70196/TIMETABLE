@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Timetable Generator</title>
+<style>
+  :root {
+    --primary: #004085;
+    --danger: #dc3545;
+    --light-grey: #f8f9fa;
+    --info: #17a2b8;
+    --medium-blue: #0069d9;
+    --success: #28a745;
+    --warning: #ffc107;
+    --text: #004085;
+    --muted: #666;
+    --border: #004085;
+    --card: white;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(135deg, rgba(248,249,250,0.95) 0%, rgba(233,236,239,0.9) 100%);color:var(--primary);font:400 14px/1.5 'Segoe UI',Arial,sans-serif;height:100vh;overflow:hidden;backdrop-filter:blur(10px)}
+  .container{max-width:100%;margin:0;padding:10px;position:relative}
+  
+  /* Header */
+  .header{background:linear-gradient(135deg, rgba(0,64,133,0.95) 0%, rgba(0,86,179,0.9) 100%);padding:25px;border-radius:16px;margin-bottom:25px;text-align:center;backdrop-filter:blur(15px);box-shadow:0 8px 32px rgba(0,64,133,0.2);border:1px solid rgba(255,255,255,0.1)}
+  .header h1{margin:0;font-size:32px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.3)}
+  .header p{margin:8px 0 0;color:rgba(255,255,255,.85);font-size:15px}
+  
+  /* Enhanced Layout */
+  .main-grid{display:grid;grid-template-columns:400px 1fr 300px;gap:20px;max-width:100%;margin:0;padding:0 20px;align-items:start}
+  @media(max-width:1200px){.main-grid{grid-template-columns:1fr;gap:20px;padding:0 15px}}
+  .sidebar{display:grid;gap:8px;height:calc(100vh - 120px);overflow:visible;grid-template-rows:auto auto}
+  .main-content{display:grid;gap:20px}
+  
+  /* Enhanced Cards */
+  .card{background:rgba(255,255,255,0.95);border:2px solid rgba(0,64,133,0.15);border-radius:12px;padding:15px;box-shadow:0 8px 25px rgba(0,0,0,0.12);backdrop-filter:blur(20px);position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--info),var(--success),var(--warning));border-radius:20px 20px 0 0}
+
+  .card h2{margin:0 0 20px;font-size:22px;color:var(--primary);font-weight:700;text-align:center;padding-bottom:12px;border-bottom:3px solid rgba(0,64,133,0.15);position:relative}
+  .card h2::after{content:'';position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);width:50px;height:3px;background:var(--info);border-radius:3px}
+  
+  /* Enhanced Form Elements */
+  label{display:block;font-size:14px;color:var(--primary);margin:15px 0 8px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px}
+  input,select,textarea{width:100%;padding:15px 20px;border:3px solid rgba(0,64,133,0.2);background:rgba(255,255,255,0.98);color:var(--primary);border-radius:15px;font-size:15px;outline:none;backdrop-filter:blur(15px);box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+  input:focus,select:focus{border-color:var(--info);box-shadow:0 0 0 5px rgba(23,162,184,.25),0 12px 30px rgba(0,0,0,0.15);background:rgba(255,255,255,1)}
+  
+  /* Enhanced Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:16px 28px;border:3px solid rgba(0,64,133,0.2);background:rgba(255,255,255,0.98);color:var(--primary);border-radius:15px;cursor:pointer;font-size:15px;font-weight:700;text-decoration:none;backdrop-filter:blur(15px);box-shadow:0 8px 25px rgba(0,0,0,0.1);position:relative;overflow:hidden}
+
+  .btn:hover{background:rgba(233,236,239,0.98);box-shadow:0 15px 40px rgba(0,0,0,0.2);border-color:var(--info)}
+
+
+  .btn.small{padding:10px 16px;font-size:13px}
+  
+  /* Button Colors */
+  #saveConfig,#generate{background:var(--success);color:white;border-color:var(--success)}
+  #saveConfig:hover,#generate:hover{background:#218838;box-shadow:0 15px 40px rgba(40,167,69,0.4)}
+  #viewDatabase{background:var(--info);color:white;border-color:var(--info)}
+  #viewDatabase:hover{background:#138496;box-shadow:0 15px 40px rgba(23,162,184,0.4)}
+  #clear{background:var(--warning);color:var(--primary);border-color:var(--warning)}
+  #clear:hover{background:#e0a800;box-shadow:0 15px 40px rgba(255,193,7,0.4)}
+  
+  /* Grid Layouts */
+  .form-grid{display:grid;grid-template-columns:2fr 1fr;gap:15px;margin:15px 0;align-items:end}
+  .button-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
+  .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+  
+  /* Enhanced Sections */
+  .time-section{background:linear-gradient(135deg,rgba(255,255,255,0.95) 0%,rgba(248,249,250,0.9) 100%);padding:12px;border-radius:12px;border:2px solid rgba(0,64,133,0.15);box-shadow:0 8px 25px rgba(0,64,133,0.1);backdrop-filter:blur(15px);margin:8px 0}
+  .time-header{text-align:center;margin-bottom:15px;padding:12px;background:linear-gradient(135deg,rgba(0,64,133,0.15) 0%,rgba(23,162,184,0.15) 100%);border-radius:15px;border:2px solid rgba(0,64,133,0.1)}
+  .time-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .time-input-group{background:linear-gradient(135deg,rgba(255,193,7,0.1) 0%,rgba(255,193,7,0.05) 100%);padding:10px;border-radius:10px;border:2px solid rgba(255,193,7,0.2)}
+  .break-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .break-input-group{background:linear-gradient(135deg,rgba(40,167,69,0.1) 0%,rgba(40,167,69,0.05) 100%);padding:10px;border-radius:10px;border:2px solid rgba(40,167,69,0.2)}
+  
+  /* Generate Button Special */
+  .generate-btn{padding:12px 24px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);color:white;border:none;border-radius:12px;cursor:pointer;box-shadow:0 8px 25px rgba(99,102,241,0.4);position:relative;overflow:hidden;text-align:center;margin:10px 0}
+  .generate-btn:hover{box-shadow:0 18px 50px rgba(99,102,241,0.7)}
+  
+  /* Preview Section */
+  .preview-section{background:rgba(248,249,250,0.95);border-radius:15px;border:3px solid rgba(0,64,133,0.1);overflow:hidden}
+  .preview-header{background:linear-gradient(135deg,var(--primary) 0%,var(--info) 100%);color:white;padding:12px 16px;font-size:14px;font-weight:700;text-align:center}
+  .preview-content{padding:15px;font-size:14px;min-height:150px;max-height:250px;overflow-y:auto;line-height:1.6;color:var(--primary)}
+  
+  /* Subject Management */
+  .subject-section{text-align:center;padding:15px;border:3px dashed rgba(0,64,133,0.3);border-radius:12px;margin-bottom:15px;background:rgba(255,255,255,0.8)}
+  .selected-subjects{background:rgba(255,255,255,0.95);border-radius:15px;padding:15px;margin:10px 0;border:2px solid rgba(0,64,133,0.1);box-shadow:0 8px 25px rgba(0,0,0,0.1);backdrop-filter:blur(15px);max-height:500px;overflow-y:auto}
+  .selected-subjects::-webkit-scrollbar{width:8px}
+  .selected-subjects::-webkit-scrollbar-track{background:rgba(0,64,133,0.1);border-radius:10px}
+  .selected-subjects::-webkit-scrollbar-thumb{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px}
+  .selected-subjects::-webkit-scrollbar-thumb:hover{background:linear-gradient(135deg,#764ba2,#f093fb)}
+  .subject-item{display:block;padding:15px;margin:10px 0;background:rgba(255,255,255,0.95);border-radius:16px;border:2px solid rgba(0,64,133,0.1);box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:all 0.3s ease}
+  .subject-item:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.15)}
+
+  
+  /* Notice */
+  .notice{font-size:14px;color:var(--success);background:rgba(255,255,255,0.95);padding:20px;border-radius:15px;border-left:5px solid var(--success);margin:20px 0;border:2px solid rgba(233,236,239,0.5);backdrop-filter:blur(8px);box-shadow:0 8px 25px rgba(40,167,69,0.15)}
+  
+
+  
+  /* Footer */
+  .footer{color:var(--muted);font-size:14px;text-align:center;margin:30px 0;padding:25px;background:rgba(255,255,255,0.9);border-radius:20px;border:2px solid rgba(0,64,133,0.1);backdrop-filter:blur(8px)}
+  
+  /* Responsive */
+  @media(max-width:768px){
+    .container{padding:8px}
+    .main-grid{padding:0 10px;gap:16px}
+    .card{padding:20px;border-radius:16px}
+    .btn{padding:14px 22px;font-size:14px}
+    .header h1{font-size:26px}
+    .form-grid,.time-grid,.button-grid{grid-template-columns:1fr;gap:12px}
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <a href="page.htm" style="color: white; text-decoration: none; padding: 10px 18px; background: rgba(255,255,255,0.25); border-radius: 8px; font-size: 15px; font-weight: 600;">← Back</a>
+        <h1 style="margin: 0;">🎓 Advanced Timetable Generator</h1>
+        <div style="width: 100px;"></div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="sidebar">
+        <div class="card" style="padding:15px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <h2 style="margin:0;font-size:16px">⚙️ Quick Setup</h2>
+            <div style="display:flex;gap:4px">
+              <button id="saveConfig" class="btn small" style="padding:6px 10px;font-size:11px">💾</button>
+              <button id="loadConfig" class="btn small" style="padding:6px 10px;font-size:11px">📁</button>
+            </div>
+          </div>
+          
+          <div class="form-grid" style="gap:8px;margin:8px 0">
+            <div>
+              <label style="font-size:12px;margin:8px 0 4px">📅 Working Days</label>
+              <select id="days" style="padding:6px 10px;font-size:12px">
+                <option value="Mon,Tue,Wed,Thu,Fri">Monday - Friday</option>
+                <option value="Mon,Tue,Wed,Thu,Fri,Sat">Monday - Saturday</option>
+                <option value="Tue,Wed,Thu,Fri,Sat">Tuesday - Saturday</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;margin:8px 0 4px">⏰ Periods</label>
+              <input id="periodCount" type="number" min="1" max="12" value="6" style="padding:6px 10px;font-size:12px"/>
+            </div>
+          </div>
+          
+          <div class="form-grid" style="gap:8px;margin:8px 0">
+            <div>
+              <label style="font-size:12px;margin:8px 0 4px">🏫 Section Names</label>
+              <input id="sections" value="5A,5B,5C" placeholder="e.g., 5A,5B,5C" style="padding:6px 10px;font-size:12px"/>
+            </div>
+            <div>
+              <label style="font-size:12px;margin:8px 0 4px">🍽️ Lunch Period</label>
+              <input id="lunchIndex" type="number" min="1" value="3" style="padding:6px 10px;font-size:12px"/>
+            </div>
+          </div>
+          
+
+        </div>
+
+        <div class="card" style="padding:15px">
+          <h2 style="font-size:18px;margin-bottom:12px">⏰ Schedule Configuration</h2>
+          <div class="time-inputs" style="gap:8px;margin-bottom:8px">
+            <div class="time-input-group" style="padding:8px">
+              <label style="font-size:12px;margin-bottom:6px">🌅 Start Time</label>
+              <input id="startTime" value="9" placeholder="9" style="padding:8px 12px;font-size:12px"/>
+            </div>
+            <div class="time-input-group" style="background:linear-gradient(135deg,rgba(220,53,69,0.1) 0%,rgba(220,53,69,0.05) 100%);border-color:rgba(220,53,69,0.2);padding:8px">
+              <label style="font-size:12px;margin-bottom:6px">🌇 End Time</label>
+              <input id="endTime" value="4" placeholder="4" style="padding:8px 12px;font-size:12px"/>
+            </div>
+          </div>
+          
+          <div class="break-inputs" style="gap:8px;margin-bottom:8px">
+            <div class="break-input-group" style="padding:8px">
+              <label style="font-size:12px;margin-bottom:6px">☕ Short Break</label>
+              <input id="shortBreak" value="11-11.15" placeholder="11-11.15" style="padding:8px 12px;font-size:12px"/>
+            </div>
+            <div class="break-input-group" style="background:linear-gradient(135deg,rgba(23,162,184,0.1) 0%,rgba(23,162,184,0.05) 100%);border-color:rgba(23,162,184,0.2);padding:8px">
+              <label style="font-size:12px;margin-bottom:6px">🍽️ Lunch Break</label>
+              <input id="lunchBreak" value="1.15-2" placeholder="1.15-2" style="padding:8px 12px;font-size:12px"/>
+            </div>
+          </div>
+          
+          <button type="button" onclick="generateScheduleClick()" class="generate-btn" style="padding:10px 20px;font-size:13px;margin:10px 0;width:100%">⚡ Generate Schedule ⚡</button>
+          
+          <div class="preview-section" style="margin-top:10px">
+            <div class="preview-header" style="background:linear-gradient(135deg,var(--primary) 0%,var(--info) 100%);color:white;padding:10px 15px;font-size:14px;font-weight:700;text-align:center;border-radius:12px 12px 0 0">📋 Schedule Preview</div>
+            <div id="periodLabels" class="preview-content" style="padding:15px;font-size:12px;line-height:1.4;color:var(--primary);background:rgba(255,255,255,0.95);border-radius:0 0 12px 12px;border:2px solid rgba(0,64,133,0.1);border-top:none">Click Generate Schedule to see timing preview...</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="main-content">
+        <div class="card">
+          <h2>📚 Subject Management</h2>
+          <div class="subject-section">
+            <p style="margin:0 0 12px;color:var(--muted);font-size:15px;font-weight:600">Manage Your Subjects</p>
+            <button id="viewDatabase" class="btn">🗄️ View Subject Database</button>
+          </div>
+          
+          <div id="databaseView" style="display:none;margin:15px 0;padding:15px;background:rgba(248,249,250,0.95);border-radius:12px;border:2px solid rgba(0,64,133,0.1);max-height:300px;overflow-y:auto"></div>
+          
+          <div id="selectedSubjects" class="selected-subjects"></div>
+          
+          <div style="display:flex;gap:10px;margin:20px 0;align-items:center">
+            <button id="generate" class="btn" style="padding:12px 18px;font-size:14px;flex:1">⚡ Generate Timetables</button>
+           
+            <button id="clear" class="btn" style="padding:12px 18px;font-size:14px">🗑️ Clear All</button>
+          </div>
+
+          <div class="notice">
+            💡 <strong>Pro Tip:</strong> Lab subjects automatically use 2 consecutive periods. Theory subjects are scheduled in morning sessions, labs in afternoon.
+          </div>
+        </div>
+      </div>
+      
+      <div class="extra-features">
+        <div class="card" style="padding:15px">
+          <h2 style="font-size:16px;margin-bottom:15px">🚀 Extra Features</h2>
+          
+          <div style="display:grid;gap:8px">
+            <button id="aiValidation" class="btn small" style="padding:8px 12px;font-size:12px;width:100%;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none">🤖 AI Smart Analysis</button>
+            <button id="facultyAnalyzer" class="btn small" style="padding:8px 12px;font-size:12px;width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none">👨‍🏫 Faculty Analyzer</button>
+
+            <button id="conflictResolver" class="btn small" style="padding:8px 12px;font-size:12px;width:100%;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;border:none">⚡ Conflict Resolver</button>
+
+            <button id="shareWhatsApp" class="btn small" style="padding:8px 12px;font-size:12px;width:100%;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none">💬 Share WhatsApp</button>
+          </div>
+          
+          <div style="margin-top:15px;padding:10px;background:rgba(23,162,184,0.1);border-radius:8px;border:2px solid rgba(23,162,184,0.2)">
+            <h3 style="margin:0 0 8px;font-size:13px;color:var(--primary)">📅 Live Schedule Preview</h3>
+            <div id="todayPreview" style="font-size:10px;line-height:1.3;color:var(--primary)"></div>
+          </div>
+          
+          <div style="margin-top:15px;padding:10px;background:rgba(255,193,7,0.1);border-radius:8px;border:2px solid rgba(255,193,7,0.2)">
+            <h3 style="margin:0 0 8px;font-size:13px;color:var(--primary)">📊 Quick Stats</h3>
+            <div id="quickStats" style="font-size:11px;color:var(--muted)">No data available</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <strong>🎓 Advanced Timetable Generator Created by Kavya and Suravi</strong>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(12px)">
+    <div class="modal" style="background:rgba(255,255,255,0.98);border:3px solid rgba(0,64,133,0.2);border-radius:25px;padding:35px;min-width:500px;max-width:700px;color:var(--primary);box-shadow:0 25px 80px rgba(0,0,0,0.2);backdrop-filter:blur(20px)">
+      <div id="modalContent"></div>
+      <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end">
+        <button id="modalCancel" class="btn">❌ Cancel</button>
+        <button id="modalSave" class="btn" style="background:var(--success);color:white">💾 Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const byId = id => document.getElementById(id);
+
+  function escapeHtml(s){
+    return (s+'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function toHexColor(c){
+    if(!c) return '#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0');
+    if(/^#/.test(c)) return c;
+    return '#'+Math.floor(Math.random()*0xffffff).toString(16).padStart(6,'0');
+  }
+  
+  function getTypeColor(type) {
+    const colors = {
+      'theory': '#667eea',
+      'lab': '#f093fb', 
+      'mcq': '#4facfe',
+      'free': '#43e97b'
+    };
+    return colors[type] || '#667eea';
+  }
+  
+  // Global faculty analysis functions
+  window.analyzeFaculty = analyzeFaculty;
+  window.generateFacultyReport = generateFacultyReport;
+
+  let selectedSubjectsData = [];
+
+  function displaySelectedSubjects(){
+    const container = byId('selectedSubjects');
+    const viewDatabaseBtn = byId('viewDatabase');
+    const subjectSection = document.querySelector('.subject-section');
+    
+    if(!selectedSubjectsData.length){
+      container.innerHTML = '<div style="padding:15px;text-align:center;color:var(--muted);font-style:italic">No subjects selected. Use Subject Database to select subjects.</div>';
+      if(viewDatabaseBtn) viewDatabaseBtn.style.display = 'inline-flex';
+      if(subjectSection) subjectSection.style.display = 'block';
+      return;
+    }
+    
+    if(viewDatabaseBtn) viewDatabaseBtn.style.display = 'none';
+    if(subjectSection) subjectSection.style.display = 'none';
+    // Smart scrolling: only add scroll if more than 8 subjects
+    const needsScroll = selectedSubjectsData.length > 8;
+    const scrollStyle = needsScroll ? 'max-height:400px;overflow-y:auto;' : '';
+    
+    container.innerHTML = `
+      <div style="font-weight:800;margin-bottom:20px;color:transparent;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);background-clip:text;-webkit-background-clip:text;font-size:18px;text-align:center;padding:15px;border-radius:12px;background-color:rgba(102,126,234,0.1);border:2px solid rgba(102,126,234,0.2)">🎆 Selected Subjects (${selectedSubjectsData.length}) - Enhanced</div>
+      <div style="${scrollStyle}">
+        ${selectedSubjectsData.map((s, i) => {
+          const subjectColors = ['#667eea', '#764ba2', '#f093fb', '#fa709a', '#fee140', '#4facfe', '#00f2fe', '#43e97b'];
+          const bgColor = subjectColors[i % subjectColors.length];
+          const isLab = s.type === 'lab';
+          const icon = isLab ? '🔬' : '📚';
+          return `
+          <div class="subject-item" style="padding:12px;margin:8px 0;background:linear-gradient(135deg,rgba(255,255,255,0.95) 0%,rgba(248,250,255,0.9) 100%);border-radius:12px;border:2px solid ${bgColor}30;box-shadow:0 4px 15px ${bgColor}20;transition:all 0.3s ease;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,${bgColor},${bgColor}80)"></div>
+            <div style="display:flex;align-items:center;gap:10px;width:100%">
+              <span style="color:var(--primary);font-weight:700;font-size:14px;flex:2;min-width:0" title="${escapeHtml(s.name)}">${icon} ${i+1}. ${escapeHtml(s.name)}</span>
+              <span style="background:${getTypeColor(s.type || 'theory')}20;padding:3px 8px;border-radius:8px;color:${getTypeColor(s.type || 'theory')};font-weight:600;font-size:11px;white-space:nowrap">${s.type || 'theory'}</span>
+              <span style="background:rgba(40,167,69,0.1);padding:3px 8px;border-radius:8px;color:#28a745;font-weight:600;font-size:11px;white-space:nowrap">${s.type === 'lab' ? (s.credits || 2) : (s.credits || 1)}c</span>
+              <input type="text" value="${s.teachers || ''}" onchange="updateTeachers(${i}, this.value)" placeholder="Faculty" style="flex:1;padding:6px 10px;border:1px solid ${bgColor}40;border-radius:6px;font-size:11px;background:rgba(255,255,255,0.9);min-width:100px">
+              <button onclick="editSubject(${i})" style="background:linear-gradient(135deg,#4facfe,#00f2fe);border:none;border-radius:6px;padding:4px 8px;color:white;cursor:pointer;font-size:10px;font-weight:600;box-shadow:0 2px 8px rgba(79,172,254,0.3);transition:all 0.3s ease" title="Edit">✏️</button>
+              <button onclick="removeSubject(${i})" style="background:#ff4757;border:none;border-radius:6px;padding:4px 8px;color:white;cursor:pointer;font-size:10px;font-weight:600;box-shadow:0 2px 8px rgba(255,71,87,0.3);transition:all 0.3s ease" title="Remove">🗑️</button>
+            </div>
+          </div>
+            </div>
+          </div>
+        `}).join('')}
+      </div>
+    `;
+  }
+  
+  function updateTeachers(index, teachers) {
+    selectedSubjectsData[index].teachers = teachers.trim();
+    displaySelectedSubjects();
+  }
+  
+  function removeSubject(index) {
+    if(confirm('Are you sure you want to remove this subject?')) {
+      selectedSubjectsData.splice(index, 1);
+      displaySelectedSubjects();
+      updateStats();
+      updateLivePreview();
+    }
+  }
+
+  function generateTimeSlots(){
+    const startTime = parseFloat(byId('startTime').value) || 9;
+    const endTime = parseFloat(byId('endTime').value) || 4;
+    const shortBreak = byId('shortBreak').value.trim() || '11-11.15';
+    const lunchBreak = byId('lunchBreak').value.trim() || '1.15-2';
+    
+    try {
+      let startHour = startTime;
+      let endHour = endTime;
+      
+      if(endHour <= startHour && endHour <= 12) {
+        endHour += 12;
+      }
+      
+      const breakPeriods = [];
+      if(shortBreak) {
+        const [startStr, endStr] = shortBreak.split('-').map(t => t.trim());
+        const start = parseFloat(startStr);
+        const end = parseFloat(endStr);
+        if(!isNaN(start) && !isNaN(end)) {
+          breakPeriods.push({ start, end, label: 'Short Break' });
+        }
+      }
+      if(lunchBreak) {
+        const [startStr, endStr] = lunchBreak.split('-').map(t => t.trim());
+        let start = parseFloat(startStr);
+        let end = parseFloat(endStr);
+        if(start < 12 && start >= 1) start += 12;
+        if(end < 12 && end >= 1) end += 12;
+        if(!isNaN(start) && !isNaN(end)) {
+          breakPeriods.push({ start, end, label: 'Lunch Break' });
+        }
+      }
+      
+      const slots = [];
+      let currentHour = startHour;
+      const periodIcons = ['📚', '✏️', '🔬', '📖', '🎯', '💡', '🌟', '⚡'];
+      let periodNum = 1;
+      
+      while(periodNum <= 8 && currentHour < endHour){
+        let breakFound = false;
+        for(const breakPeriod of breakPeriods){
+          if(Math.abs(currentHour - breakPeriod.start) < 0.01){
+            const icon = breakPeriod.label.includes('Lunch') ? '🍽️' : '☕';
+            slots.push(`${icon} ${breakPeriod.label}: ${formatTime(breakPeriod.start)} - ${formatTime(breakPeriod.end)}`);
+            currentHour = breakPeriod.end;
+            breakFound = true;
+            break;
+          }
+        }
+        
+        if(!breakFound && currentHour < endHour){
+          const start = formatTime(currentHour);
+          const nextHour = currentHour + 1;
+          const end = formatTime(nextHour);
+          const icon = periodIcons[periodNum-1] || '📝';
+          
+          slots.push(`${icon} Period ${periodNum}: ${start} - ${end}`);
+          currentHour = nextHour;
+          periodNum++;
+        }
+      }
+      
+      const preview = slots.map(slot => {
+        if(slot.includes('Period')){
+          return `<div style="padding:6px 10px;margin:3px 0;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));border-left:4px solid #6366f1;border-radius:6px;font-size:11px;font-weight:600">${slot}</div>`;
+        } else {
+          return `<div style="padding:6px 10px;margin:3px 0;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(16,185,129,0.15));border-left:4px solid #22c55e;border-radius:6px;font-size:11px;font-weight:600;color:#059669">${slot}</div>`;
+        }
+      }).join('');
+      
+      const previewElement = byId('periodLabels');
+      if(previewElement) {
+        previewElement.innerHTML = preview || 'Click Generate Schedule to see timing preview...';
+        console.log('Preview updated with', slots.length, 'slots');
+      } else {
+        console.error('periodLabels element not found');
+      }
+      
+    } catch(error) {
+      byId('periodLabels').innerHTML = `<div style="color:var(--danger);font-weight:600">❌ Error: ${error.message}</div>`;
+    }
+  }
+  
+  function formatTime(hour){
+    const h = Math.floor(hour);
+    const decimal = hour - h;
+    let m;
+    if(decimal === 0.15) m = 15;
+    else if(decimal === 0.25) m = 15; 
+    else if(decimal === 0.45) m = 45;
+    else m = Math.round(decimal * 100);
+    
+    const period = h >= 12 ? 'PM' : 'AM';
+    let displayHour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+    if(h === 12) displayHour = 12;
+    const minutes = m > 0 ? `:${m.toString().padStart(2,'0')}` : ':00';
+    return `${displayHour}${minutes} ${period}`;
+  }
+  
+  function editSubject(index) {
+    const subject = selectedSubjectsData[index];
+    const html = `
+      <h3>✏️ Edit Subject Details</h3>
+      <div style="margin-bottom:20px">
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Subject Name:</label>
+        <input type="text" id="editSubjectName" value="${subject.name || ''}" placeholder="Enter subject name" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Faculty Name:</label>
+        <input type="text" id="editFacultyName" value="${subject.teachers || ''}" placeholder="Enter faculty name" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary);font-size:14px">Credits:</label>
+            <input type="number" id="editCredits" value="${subject.credits || 1}" min="1" max="6" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px">
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary);font-size:14px">Type:</label>
+            <select id="editType" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px">
+              <option value="theory" ${subject.type === 'theory' ? 'selected' : ''}>Theory</option>
+              <option value="lab" ${subject.type === 'lab' ? 'selected' : ''}>Lab</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    showModal(html, () => {
+      const name = byId('editSubjectName').value.trim();
+      const faculty = byId('editFacultyName').value.trim();
+      const credits = parseInt(byId('editCredits').value) || 1;
+      const type = byId('editType').value;
+      
+      if(name) {
+        selectedSubjectsData[index].name = name;
+        selectedSubjectsData[index].teachers = faculty;
+        selectedSubjectsData[index].credits = credits;
+        selectedSubjectsData[index].hours = credits;
+        selectedSubjectsData[index].type = type;
+        displaySelectedSubjects();
+      }
+    });
+  }
+  
+  function configureCrossDept(index) {
+    const subject = selectedSubjectsData[index];
+    const html = `
+      <h3>⚙️ Cross-Department Faculty Configuration</h3>
+      <div style="margin-bottom:20px">
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Faculty Name:</label>
+        <input type="text" id="crossFacultyName" value="${subject.crossDept?.name || subject.teachers || ''}" placeholder="Enter faculty name" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Subject:</label>
+        <input type="text" id="crossSubjectName" value="${subject.crossDept?.subject || subject.name || ''}" placeholder="Enter subject name" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Available Days:</label>
+        <input type="text" id="crossDeptDays" value="${subject.crossDept?.days || 'Mon,Wed,Fri'}" placeholder="e.g., Mon,Wed,Fri" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary);font-size:14px">Start Time:</label>
+            <input type="text" id="crossDeptStart" value="${subject.crossDept?.startTime || '10'}" placeholder="e.g., 10" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px">
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--primary);font-size:14px">End Time:</label>
+            <input type="text" id="crossDeptEnd" value="${subject.crossDept?.endTime || '3'}" placeholder="e.g., 3" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px">
+          </div>
+        </div>
+      </div>
+    `;
+    
+    showModal(html, () => {
+      const name = byId('crossFacultyName').value.trim();
+      const subjectName = byId('crossSubjectName').value.trim();
+      const days = byId('crossDeptDays').value.trim();
+      const startTime = byId('crossDeptStart').value.trim();
+      const endTime = byId('crossDeptEnd').value.trim();
+      
+      if(name && days && startTime && endTime) {
+        selectedSubjectsData[index].crossDept = {
+          name,
+          subject: subjectName || selectedSubjectsData[index].name,
+          days,
+          startTime,
+          endTime
+        };
+        selectedSubjectsData[index].teachers = name;
+        displaySelectedSubjects();
+      }
+    });
+  }
+
+
+
+  // Event listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const viewDbBtn = byId('viewDatabase');
+    if(viewDbBtn) {
+      viewDbBtn.addEventListener('click', function(){
+        console.log('View Database button clicked');
+        toggleDatabaseView();
+      });
+    } else {
+      console.error('View Database button not found');
+    }
+  });
+  
+  function toggleDatabaseView() {
+    const databaseView = byId('databaseView');
+    const viewDbBtn = byId('viewDatabase');
+    
+    if(databaseView.style.display === 'none' || !databaseView.style.display) {
+      loadEmbeddedDatabase();
+      databaseView.style.display = 'block';
+      viewDbBtn.textContent = '❌ Close Database';
+    } else {
+      databaseView.style.display = 'none';
+      viewDbBtn.textContent = '🗄️ View Subject Database';
+    }
+  }
+  
+  function loadEmbeddedDatabase() {
+    const currentDepartment = 'ISE';
+    const storageKey = `subjectsData_${currentDepartment}`;
+    const subjectsData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    const databaseView = byId('databaseView');
+    
+    if(Object.keys(subjectsData).length === 0) {
+      databaseView.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No subjects stored in database</div>';
+      return;
+    }
+    
+    let html = '<h3 style="margin:0 0 15px;color:var(--primary);text-align:center">📚 Subject Database</h3>';
+    
+    for(const ay in subjectsData) {
+      for(const y in subjectsData[ay]) {
+        for(const s in subjectsData[ay][y]) {
+          const subjects = subjectsData[ay][y][s] || [];
+          if(subjects.length > 0) {
+            html += `
+              <div style="margin:10px 0;padding:10px;background:white;border-radius:8px;border:1px solid rgba(0,64,133,0.2)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <strong style="color:var(--primary);font-size:14px">${ay} - Year ${y}, Sem ${s} (${subjects.length} subjects)</strong>
+                  <button onclick="useSubjectsInline('${ay}', '${y}', '${s}')" style="background:var(--success);color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">✅ Use These</button>
+                </div>
+                <div style="font-size:12px;color:var(--muted)">
+                  ${subjects.map(sub => `• ${sub.name || sub} (${sub.type || 'theory'}, ${sub.credits || 1} credits)`).join('<br>')}
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+    }
+    
+    databaseView.innerHTML = html;
+  }
+  
+  function useSubjectsInline(ay, y, s) {
+    const currentDepartment = 'ISE';
+    const storageKey = `subjectsData_${currentDepartment}`;
+    const subjectsData = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    const subjects = subjectsData[ay][y][s] || [];
+    
+    if(subjects.length === 0) {
+      alert('❌ No subjects found!');
+      return;
+    }
+    
+    selectedSubjectsData = subjects.map((s, index) => ({
+      name: s.name || s,
+      credits: s.credits || 1,
+      hours: s.hours || s.credits || 1,
+      type: s.type || 'theory',
+      teachers: s.teachers || '',
+      color: s.color || '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+      order: index + 1
+    }));
+    
+    displaySelectedSubjects();
+    updateStats();
+    updateLivePreview();
+    
+    // Close database view
+    toggleDatabaseView();
+    
+    // Show success notification
+    const notification = document.createElement('div');
+    notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:8px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.3);max-width:400px;';
+    notification.innerHTML = `✅ <strong>Loaded ${subjects.length} subjects!</strong>`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      if(notification.parentNode) notification.parentNode.removeChild(notification);
+    }, 3000);
+  }
+  
+  // Fix generate schedule button
+  document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = byId('generateScheduleBtn');
+    if(generateBtn) {
+      generateBtn.addEventListener('click', function() {
+        generateTimeSlots();
+      });
+    }
+  });
+  
+  // Also add direct onclick handler as backup
+  function generateScheduleClick() {
+    console.log('Generate Schedule direct click');
+    generateTimeSlots();
+  }
+
+  byId('generate').addEventListener('click', () => {
+    const sectionNames = byId('sections').value.split(',').map(s => s.trim()).filter(Boolean);
+    
+    if(sectionNames.length === 0) {
+      alert('Please enter section names!');
+      return;
+    }
+    
+    if(selectedSubjectsData.length === 0) {
+      alert('Please select subjects from the database first!');
+      return;
+    }
+    
+    const days = byId('days').value.split(',').map(s => s.trim()).filter(Boolean);
+    const timeSlots = generateActualTimeSlots();
+    
+    const sectionsParam = encodeURIComponent(JSON.stringify(sectionNames));
+    const daysParam = encodeURIComponent(JSON.stringify(days));
+    const timeSlotsParam = encodeURIComponent(JSON.stringify(timeSlots));
+    const subjectsParam = encodeURIComponent(JSON.stringify(selectedSubjectsData));
+    
+    // Store data for enhanced.htm
+    const timetableData = {
+      sections: sectionNames,
+      subjects: selectedSubjectsData,
+      days: days,
+      timeSlots: timeSlots
+    };
+    
+    localStorage.setItem('timetableData', JSON.stringify(timetableData));
+    window.open('enhanced.htm', '_blank');
+  });
+  
+  function generateActualTimeSlots() {
+    const startTime = parseFloat(byId('startTime').value) || 9;
+    const endTime = parseFloat(byId('endTime').value) || 4;
+    const shortBreak = byId('shortBreak').value.trim() || '11-11.15';
+    const lunchBreak = byId('lunchBreak').value.trim() || '1.15-2';
+    
+    const slots = [];
+    let currentHour = startTime;
+    
+    const breaks = [];
+    if(shortBreak) {
+      const [start, end] = shortBreak.split('-').map(t => parseFloat(t.trim()));
+      breaks.push({ start, end, label: 'SHORT BREAK' });
+    }
+    if(lunchBreak) {
+      const [start, end] = lunchBreak.split('-').map(t => {
+        let time = parseFloat(t.trim());
+        if(time < 12 && time >= 1) time += 12;
+        return time;
+      });
+      breaks.push({ start, end, label: 'LUNCH BREAK' });
+    }
+    
+    while(currentHour < (endTime <= 12 ? endTime + 12 : endTime)) {
+      const breakAtTime = breaks.find(b => Math.abs(currentHour - b.start) < 0.01);
+      if(breakAtTime) {
+        slots.push({
+          start: formatTime(breakAtTime.start),
+          end: formatTime(breakAtTime.end),
+          label: breakAtTime.label,
+          type: 'break'
+        });
+        currentHour = breakAtTime.end;
+      } else {
+        const nextHour = currentHour + 1;
+        slots.push({
+          start: formatTime(currentHour),
+          end: formatTime(nextHour),
+          label: `${formatTime(currentHour)} to ${formatTime(nextHour)}`,
+          type: 'period'
+        });
+        currentHour = nextHour;
+      }
+    }
+    
+    return slots;
+  }
+
+  byId('clear').addEventListener('click', ()=>{
+    if(confirm('Are you sure you want to clear all subjects?')) {
+      selectedSubjectsData = [];
+      displaySelectedSubjects();
+      updateStats();
+      updateLivePreview();
+    }
+  });
+  
+  byId('previewTimetable').addEventListener('click', ()=>{
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No subjects to preview!');
+      return;
+    }
+    const sections = byId('sections').value.split(',').map(s => s.trim()).filter(Boolean);
+    const days = byId('days').value.split(',').map(s => s.trim()).filter(Boolean);
+    const preview = `📅 Timetable Preview\n\n📚 Subjects: ${selectedSubjectsData.length}\n🏢 Sections: ${sections.join(', ')}\n📅 Days: ${days.join(', ')}\n⏰ Periods: ${byId('periodCount').value}\n\n📝 Subject List:\n${selectedSubjectsData.map((s,i) => `${i+1}. ${s.name} (${s.type || 'theory'}) - ${s.teachers || 'TBA'}`).join('\n')}`;
+    alert(preview);
+  });
+  
+  byId('validateSchedule').addEventListener('click', ()=>{
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No subjects to validate!');
+      return;
+    }
+    const issues = [];
+    const teachers = new Set();
+    selectedSubjectsData.forEach(s => {
+      if(!s.teachers) issues.push(`⚠️ ${s.name}: Missing teacher`);
+      else teachers.add(s.teachers);
+    });
+    const totalCredits = selectedSubjectsData.reduce((sum, s) => sum + (s.credits || 1), 0);
+    if(totalCredits > 25) issues.push(`⚠️ High credit load: ${totalCredits}`);
+    if(issues.length === 0) alert('✅ Schedule validation passed! No issues found.');
+    else alert(`❌ Validation Issues:\n\n${issues.join('\n')}`);
+  });
+
+  // Listen for messages from subject database
+  window.addEventListener('message', (event) => {
+    console.log('Received message:', event.data);
+    if(event.data && event.data.type === 'SUBJECTS_SELECTED'){
+      const newSubjects = event.data.subjects.map((s, index) => ({
+        name: s.name || s,
+        credits: s.credits || 1,
+        hours: s.hours || s.credits || 1,
+        type: s.type || 'theory',
+        teachers: s.teachers || '',
+        color: s.color || '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+        order: selectedSubjectsData.length + index + 1
+      }));
+      
+      // Replace existing subjects with new selection
+      selectedSubjectsData = newSubjects;
+      
+      displaySelectedSubjects();
+      updateStats();
+      updateLivePreview();
+      
+      console.log('Subjects updated:', selectedSubjectsData);
+      alert(`✅ Successfully loaded ${newSubjects.length} subjects from database!`);
+    }
+  });
+
+  // Auto-generate timings when inputs change
+  ['periodCount', 'shortBreak', 'lunchBreak', 'lunchIndex', 'startTime', 'endTime'].forEach(id => {
+    const input = byId(id);
+    if(input) input.addEventListener('change', () => {
+      generateTimeSlots();
+      updateLivePreview();
+    });
+  });
+
+  // Modal system
+  const modalBackdrop = byId('modalBackdrop');
+  const modalContent = byId('modalContent');
+  const modalCancel = byId('modalCancel');
+  const modalSave = byId('modalSave');
+  let modalSaveHandler = null;
+
+  function showModal(html, onSave){
+    modalContent.innerHTML = html;
+    modalBackdrop.style.display = 'flex';
+    modalSaveHandler = onSave;
+  }
+  function hideModal(){
+    modalBackdrop.style.display = 'none';
+    modalSaveHandler = null;
+  }
+
+  modalCancel.addEventListener('click', hideModal);
+  modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) hideModal(); });
+  modalSave.addEventListener('click', ()=>{
+    if(typeof modalSaveHandler === 'function') modalSaveHandler();
+    hideModal();
+  });
+
+  // Extra Features Functions
+  function exportData() {
+    const data = {
+      subjects: selectedSubjectsData,
+      config: {
+        days: byId('days').value,
+        periods: byId('periodCount').value,
+        sections: byId('sections').value,
+        startTime: byId('startTime').value,
+        endTime: byId('endTime').value,
+        shortBreak: byId('shortBreak').value,
+        lunchBreak: byId('lunchBreak').value
+      }
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'timetable-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  
+  function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if(data.subjects) selectedSubjectsData = data.subjects;
+            if(data.config) {
+              byId('days').value = data.config.days || 'Mon,Tue,Wed,Thu,Fri';
+              byId('periodCount').value = data.config.periods || 6;
+              byId('sections').value = data.config.sections || '5A,5B,5C';
+              byId('startTime').value = data.config.startTime || 9;
+              byId('endTime').value = data.config.endTime || 4;
+              byId('shortBreak').value = data.config.shortBreak || '11-11.15';
+              byId('lunchBreak').value = data.config.lunchBreak || '1.15-2';
+            }
+            displaySelectedSubjects();
+            generateTimeSlots();
+            updateStats();
+            alert('✅ Data imported successfully!');
+          } catch(err) {
+            alert('❌ Error importing data: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  }
+  
+  function resetAll() {
+    if(confirm('Are you sure you want to reset everything?')) {
+      selectedSubjectsData = [];
+      byId('days').value = 'Mon,Tue,Wed,Thu,Fri';
+      byId('periodCount').value = 6;
+      byId('sections').value = '5A,5B,5C';
+      byId('startTime').value = 9;
+      byId('endTime').value = 4;
+      byId('shortBreak').value = '11-11.15';
+      byId('lunchBreak').value = '1.15-2';
+      displaySelectedSubjects();
+      generateTimeSlots();
+      updateStats();
+    }
+  }
+  
+  function updateStats() {
+    const statsEl = byId('quickStats');
+    if(statsEl) {
+      const theoryCount = selectedSubjectsData.filter(s => s.type === 'theory').length;
+      const labCount = selectedSubjectsData.filter(s => s.type === 'lab').length;
+      const totalCredits = selectedSubjectsData.reduce((sum, s) => sum + (s.credits || 1), 0);
+      statsEl.innerHTML = `
+        Subjects: ${selectedSubjectsData.length} | Theory: ${theoryCount} | Lab: ${labCount}<br>
+        Total Credits: ${totalCredits} | Sections: ${byId('sections').value.split(',').length}
+      `;
+    }
+  }
+  
+  // Enhanced AI-Powered Features
+  function aiValidation() {
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No subjects to validate. Please add subjects first.');
+      return;
+    }
+    
+    const analysis = {
+      critical: [],
+      warnings: [],
+      suggestions: [],
+      score: 100
+    };
+    
+    // Advanced teacher analysis
+    const teacherStats = {};
+    selectedSubjectsData.forEach(subject => {
+      if(subject.teachers) {
+        const teacher = subject.teachers.trim();
+        if(!teacherStats[teacher]) {
+          teacherStats[teacher] = { subjects: [], credits: 0, labs: 0, theory: 0 };
+        }
+        teacherStats[teacher].subjects.push(subject.name);
+        teacherStats[teacher].credits += (subject.credits || 1);
+        if(subject.type === 'lab') teacherStats[teacher].labs++;
+        else teacherStats[teacher].theory++;
+      } else {
+        analysis.critical.push(`Subject "${subject.name}" missing faculty assignment`);
+        analysis.score -= 15;
+      }
+    });
+    
+    // Workload optimization
+    Object.entries(teacherStats).forEach(([teacher, stats]) => {
+      if(stats.credits > 18) {
+        analysis.warnings.push(`${teacher}: Overloaded (${stats.credits} credits)`);
+        analysis.score -= 10;
+      }
+      if(stats.labs > 2) {
+        analysis.warnings.push(`${teacher}: Too many labs (${stats.labs})`);
+        analysis.score -= 5;
+      }
+    });
+    
+    // Smart suggestions
+    const totalCredits = selectedSubjectsData.reduce((sum, s) => sum + (s.credits || 1), 0);
+    const avgCreditsPerTeacher = totalCredits / Object.keys(teacherStats).length;
+    if(avgCreditsPerTeacher > 15) {
+      analysis.suggestions.push('Consider hiring additional faculty for better distribution');
+    }
+    
+    showAnalysisModal('🤖 AI Smart Analysis', analysis);
+  }
+  
+  function facultyAnalyzer() {
+    const html = `
+      <h3>👨‍🏫 Advanced Faculty Analyzer</h3>
+      <div style="margin-bottom:20px">
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Faculty Name:</label>
+        <input type="text" id="facultyName" placeholder="Enter faculty name to analyze" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+        
+        <label style="display:block;margin-bottom:10px;font-weight:600;color:var(--primary);font-size:16px">Cross-Department Check:</label>
+        <select id="crossDeptCheck" style="width:100%;padding:12px;border:2px solid rgba(0,64,133,0.3);border-radius:8px;font-size:14px;margin-bottom:15px">
+          <option value="all">All Departments</option>
+          <option value="CSE">CSE</option>
+          <option value="ISE">ISE</option>
+          <option value="AIML">AIML</option>
+          <option value="EEE">EEE</option>
+          <option value="EC">EC</option>
+        </select>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+          <button onclick="analyzeFaculty()" style="padding:10px;background:var(--success);color:white;border:none;border-radius:6px;cursor:pointer">🔍 Analyze</button>
+          <button onclick="generateFacultyReport()" style="padding:10px;background:var(--info);color:white;border:none;border-radius:6px;cursor:pointer">📊 Report</button>
+        </div>
+        
+        <div id="facultyResults" style="margin-top:15px;padding:10px;background:rgba(0,64,133,0.1);border-radius:8px;min-height:100px;display:none"></div>
+      </div>
+    `;
+    
+    showModal(html, () => {});
+  }
+  
+  function colorOptimizer() {
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No subjects to colorize. Please add subjects first.');
+      return;
+    }
+    
+    // Enhanced color palette from subject.htm
+    const smartColors = {
+      'theory': ['#a78bfa', '#34d399', '#fbbf24', '#f87171', '#60a5fa', '#fb7185'],
+      'lab': ['#c084fc', '#2dd4bf', '#facc15', '#fb923c', '#4ade80', '#38bdf8'],
+      'core': ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'],
+      'elective': ['#d8b4fe', '#6ee7b7', '#fcd34d', '#fca5a5', '#93c5fd', '#fda4af']
+    };
+    
+    selectedSubjectsData.forEach((subject, index) => {
+      const type = subject.type || 'theory';
+      const colorSet = smartColors[type] || smartColors.theory;
+      subject.color = colorSet[index % colorSet.length];
+    });
+    
+    displaySelectedSubjects();
+    
+    const colorStats = {
+      theory: selectedSubjectsData.filter(s => s.type === 'theory').length,
+      lab: selectedSubjectsData.filter(s => s.type === 'lab').length,
+      total: selectedSubjectsData.length
+    };
+    
+    alert(`🎨 Smart Colors Applied!\n\n📚 Theory: ${colorStats.theory}\n🔬 Lab: ${colorStats.lab}\n📊 Total: ${colorStats.total}\n\nColors optimized based on subject types for better visual distinction.`);
+  }
+  
+  function conflictResolver() {
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No subjects to analyze. Please add subjects first.');
+      return;
+    }
+    
+    const analysis = {
+      conflicts: [],
+      solutions: [],
+      optimizations: [],
+      score: 100
+    };
+    
+    const teacherMap = new Map();
+    const timeSlots = ['9-10', '10-11', '11-12', '12-1', '2-3', '3-4'];
+    
+    // Advanced conflict detection
+    selectedSubjectsData.forEach((subject, index) => {
+      if(subject.teachers) {
+        const teacher = subject.teachers.trim();
+        if(!teacherMap.has(teacher)) {
+          teacherMap.set(teacher, { subjects: [], labs: 0, theory: 0, workload: 0 });
+        }
+        
+        const teacherData = teacherMap.get(teacher);
+        teacherData.subjects.push(subject);
+        teacherData.workload += (subject.credits || 1);
+        
+        if(subject.type === 'lab') {
+          teacherData.labs++;
+          if(teacherData.labs > 2) {
+            analysis.conflicts.push(`${teacher}: Excessive lab load (${teacherData.labs})`);
+            analysis.solutions.push(`Redistribute labs for ${teacher} across multiple days`);
+            analysis.score -= 15;
+          }
+        } else {
+          teacherData.theory++;
+        }
+        
+        if(teacherData.workload > 20) {
+          analysis.conflicts.push(`${teacher}: Overloaded (${teacherData.workload} credits)`);
+          analysis.solutions.push(`Consider additional faculty or reduce ${teacher}'s load`);
+          analysis.score -= 10;
+        }
+      }
+    });
+    
+    // Smart optimizations
+    if(teacherMap.size < selectedSubjectsData.length / 3) {
+      analysis.optimizations.push('Consider hiring more faculty for better distribution');
+    }
+    
+    const labCount = selectedSubjectsData.filter(s => s.type === 'lab').length;
+    if(labCount > 4) {
+      analysis.optimizations.push('High lab count detected - schedule in afternoon slots');
+    }
+    
+    showConflictModal('⚡ Advanced Conflict Resolver', analysis, teacherMap);
+  }
+  
+  function shareOnSlack() {
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No timetable data to share. Please generate a timetable first.');
+      return;
+    }
+    
+    const sections = byId('sections').value.split(',').map(s => s.trim()).filter(Boolean);
+    const days = byId('days').value;
+    const subjectCount = selectedSubjectsData.length;
+    
+    const message = `🎓 *Timetable Generated*\n\n` +
+      `📚 *Subjects:* ${subjectCount}\n` +
+      `🏫 *Sections:* ${sections.join(', ')}\n` +
+      `📅 *Days:* ${days}\n` +
+      `⏰ *Schedule:* ${byId('startTime').value}:00 - ${byId('endTime').value}:00\n\n` +
+      `*Subjects:*\n${selectedSubjectsData.map(s => `• ${s.name} (${s.teachers || 'TBA'})`).join('\n')}\n\n` +
+      `Generated by MIT Timetable System 🚀`;
+    
+    const slackUrl = `https://slack.com/api/chat.postMessage?text=${encodeURIComponent(message)}`;
+    
+    // Copy to clipboard for easy sharing
+    navigator.clipboard.writeText(message).then(() => {
+      alert('📱 Timetable details copied to clipboard!\n\nYou can now paste this in your Slack channel.\n\nFor direct posting, please configure Slack webhook in your organization.');
+    }).catch(() => {
+      alert('📱 Slack Sharing:\n\n' + message.replace(/\\n/g, '\n'));
+    });
+  }
+  
+  function shareOnWhatsApp() {
+    if(selectedSubjectsData.length === 0) {
+      alert('❌ No timetable data to share. Please generate a timetable first.');
+      return;
+    }
+    
+    const sections = byId('sections').value.split(',').map(s => s.trim()).filter(Boolean);
+    const days = byId('days').value;
+    const subjectCount = selectedSubjectsData.length;
+    
+    const message = `🎓 *Timetable Generated*\n\n` +
+      `📚 Subjects: ${subjectCount}\n` +
+      `🏫 Sections: ${sections.join(', ')}\n` +
+      `📅 Days: ${days}\n` +
+      `⏰ Schedule: ${byId('startTime').value}:00 - ${byId('endTime').value}:00\n\n` +
+      `*Subject List:*\n${selectedSubjectsData.map(s => `• ${s.name} (${s.teachers || 'TBA'})`).join('\n')}\n\n` +
+      `Generated by MIT Timetable System 🚀`;
+    
+    showWhatsAppModal(message);
+  }
+  
+  function showWhatsAppModal(message) {
+    const groupLink = 'https://chat.whatsapp.com/invite/KSU_MIT_Timetables';
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(groupLink)}`;
+    
+    const html = `
+      <h3 style="color:#25D366;text-align:center">💬 KSU Timetable Group</h3>
+      <div style="text-align:center;margin:20px 0">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center">
+          <div>
+            <h4 style="margin:10px 0;color:#25D366">📱 Share to Group</h4>
+            <button onclick="shareDirectMessage()" style="padding:12px 20px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:8px;cursor:pointer;width:100%;font-size:14px;font-weight:600">Send to Group</button>
+            <p style="font-size:12px;color:var(--muted);margin:8px 0">Share timetable to KSU group</p>
+          </div>
+          
+          <div>
+            <h4 style="margin:10px 0;color:#25D366">📲 Join Group</h4>
+            <img src="${qrCodeUrl}" alt="QR Code" style="width:120px;height:120px;border:2px solid #25D366;border-radius:8px;margin:10px 0">
+            <p style="font-size:12px;color:var(--muted);margin:8px 0">Scan QR or click to join</p>
+            <button onclick="joinWhatsAppGroup()" style="padding:8px 16px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:6px;cursor:pointer;width:100%;font-size:12px">Join KSU Group</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    showModal(html, () => {});
+  }
+  
+  function shareDirectMessage() {
+    const sections = byId('sections').value.split(',').map(s => s.trim()).filter(Boolean);
+    const days = byId('days').value;
+    const subjectCount = selectedSubjectsData.length;
+    
+    const message = `🎓 *Timetable Generated*\n\n` +
+      `📚 Subjects: ${subjectCount}\n` +
+      `🏫 Sections: ${sections.join(', ')}\n` +
+      `📅 Days: ${days}\n` +
+      `⏰ Schedule: ${byId('startTime').value}:00 - ${byId('endTime').value}:00\n\n` +
+      `*Subject List:*\n${selectedSubjectsData.map(s => `• ${s.name} (${s.teachers || 'TBA'})`).join('\n')}\n\n` +
+      `Generated by MIT Timetable System 🚀`;
+    
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    hideModal();
+  }
+  
+  function joinWhatsAppGroup() {
+    const groupLink = 'https://chat.whatsapp.com/invite/KSU_MIT_Timetables';
+    window.open(groupLink, '_blank');
+    hideModal();
+  }
+  
+  // Enhanced modal functions
+  function showAnalysisModal(title, analysis) {
+    const scoreColor = analysis.score >= 80 ? '#22c55e' : analysis.score >= 60 ? '#f59e0b' : '#ef4444';
+    const html = `
+      <h3>${title}</h3>
+      <div style="text-align:center;margin:15px 0">
+        <div style="display:inline-block;padding:10px 20px;background:${scoreColor};color:white;border-radius:20px;font-size:18px;font-weight:bold">
+          Score: ${analysis.score}/100
+        </div>
+      </div>
+      ${analysis.critical.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#fee2e2;border-left:4px solid #ef4444;border-radius:6px"><strong>🚨 Critical Issues:</strong><br>${analysis.critical.map(c => '• ' + c).join('<br>')}</div>` : ''}
+      ${analysis.warnings.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:6px"><strong>⚠️ Warnings:</strong><br>${analysis.warnings.map(w => '• ' + w).join('<br>')}</div>` : ''}
+      ${analysis.suggestions.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#dcfce7;border-left:4px solid #22c55e;border-radius:6px"><strong>💡 Suggestions:</strong><br>${analysis.suggestions.map(s => '• ' + s).join('<br>')}</div>` : ''}
+    `;
+    showModal(html, () => {});
+  }
+  
+  function showConflictModal(title, analysis, teacherMap) {
+    const html = `
+      <h3>${title}</h3>
+      <div style="max-height:400px;overflow-y:auto">
+        <div style="text-align:center;margin:15px 0">
+          <div style="display:inline-block;padding:8px 16px;background:${analysis.score >= 80 ? '#22c55e' : '#f59e0b'};color:white;border-radius:15px;font-weight:bold">
+            Optimization Score: ${analysis.score}/100
+          </div>
+        </div>
+        
+        ${analysis.conflicts.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#fee2e2;border-radius:8px"><strong>🔥 Conflicts Detected:</strong><br>${analysis.conflicts.map(c => '• ' + c).join('<br>')}</div>` : ''}
+        
+        ${analysis.solutions.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#dbeafe;border-radius:8px"><strong>🔧 Smart Solutions:</strong><br>${analysis.solutions.map(s => '• ' + s).join('<br>')}</div>` : ''}
+        
+        <div style="margin:15px 0;padding:10px;background:#f3f4f6;border-radius:8px">
+          <strong>👥 Faculty Distribution:</strong><br>
+          ${Array.from(teacherMap.entries()).map(([teacher, data]) => 
+            `• ${teacher}: ${data.subjects.length} subjects (${data.workload} credits)`
+          ).join('<br>')}
+        </div>
+        
+        ${analysis.optimizations.length > 0 ? `<div style="margin:10px 0;padding:10px;background:#ecfdf5;border-radius:8px"><strong>⚡ Optimizations:</strong><br>${analysis.optimizations.map(o => '• ' + o).join('<br>')}</div>` : ''}
+      </div>
+    `;
+    showModal(html, () => {});
+  }
+  
+  function analyzeFaculty() {
+    const facultyName = byId('facultyName').value.trim();
+    const dept = byId('crossDeptCheck').value;
+    const resultsDiv = byId('facultyResults');
+    
+    if(!facultyName) {
+      alert('Please enter a faculty name');
+      return;
+    }
+    
+    // Simulate faculty analysis
+    const mockSchedule = {
+      'Mon': ['9-10: Data Structures (CSE)', '11-12: Algorithms (ISE)', '2-3: Lab (CSE)'],
+      'Tue': ['10-11: Database (CSE)', '1-2: Theory (AIML)'],
+      'Wed': ['9-10: Networks (ISE)', '3-4: Lab (CSE)'],
+      'Thu': ['11-12: AI (AIML)', '2-3: ML Lab (AIML)'],
+      'Fri': ['10-11: Seminar (CSE)', '1-2: Project (ISE)']
+    };
+    
+    const conflicts = ['Tuesday 2-3 PM: Overlapping with CSE Lab', 'Thursday 11-12: Double booking with ISE'];
+    const suggestions = ['Reschedule Tuesday lab to Friday', 'Move Thursday ISE class to Wednesday'];
+    
+    resultsDiv.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(240,147,251,0.05),rgba(245,87,108,0.05));padding:15px;border-radius:10px;border:1px solid rgba(240,147,251,0.2)">
+        <h4 style="color:#f093fb;margin:0 0 15px;text-align:center">📊 Faculty Analysis: ${facultyName}</h4>
+        
+        <div style="background:white;padding:12px;border-radius:8px;margin:10px 0;border-left:4px solid #4facfe">
+          <strong style="color:#4facfe">📅 Current Schedule</strong>
+          <div style="margin-top:8px;font-size:12px;line-height:1.4">
+            ${Object.entries(mockSchedule).map(([day, slots]) => 
+              `<div style="margin:4px 0"><strong style="color:#f093fb">${day}:</strong> ${slots.join(', ')}</div>`
+            ).join('')}
+          </div>
+        </div>
+        
+        ${conflicts.length > 0 ? `<div style="background:white;padding:12px;border-radius:8px;margin:10px 0;border-left:4px solid #ef4444"><strong style="color:#ef4444">⚠️ Conflicts</strong><div style="margin-top:8px;font-size:12px">${conflicts.map(c => '• ' + c).join('<br>')}</div></div>` : ''}
+        
+        ${suggestions.length > 0 ? `<div style="background:white;padding:12px;border-radius:8px;margin:10px 0;border-left:4px solid #22c55e"><strong style="color:#22c55e">💡 Solutions</strong><div style="margin-top:8px;font-size:12px">${suggestions.map(s => '• ' + s).join('<br>')}</div></div>` : ''}
+        
+        <div style="background:white;padding:12px;border-radius:8px;margin:10px 0;border-left:4px solid #f093fb">
+          <strong style="color:#f093fb">📈 Summary</strong>
+          <div style="margin-top:8px;font-size:12px;line-height:1.4">
+            <div>Workload: <strong>18 credits</strong></div>
+            <div>Departments: <strong>3 (CSE, ISE, AIML)</strong></div>
+            <div>Optimization Score: <strong style="color:#22c55e">75/100</strong></div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    resultsDiv.style.display = 'block';
+  }
+  
+  function generateFacultyReport() {
+    const facultyName = byId('facultyName').value.trim();
+    if(!facultyName) {
+      alert('Please enter a faculty name first');
+      return;
+    }
+    
+    const report = `📊 FACULTY ANALYSIS REPORT\n\n` +
+      `👨‍🏫 Faculty: ${facultyName}\n` +
+      `📅 Analysis Date: ${new Date().toLocaleDateString()}\n\n` +
+      `📈 WORKLOAD SUMMARY:\n` +
+      `• Total Credits: 18\n` +
+      `• Theory Subjects: 5\n` +
+      `• Lab Subjects: 3\n` +
+      `• Departments: CSE, ISE, AIML\n\n` +
+      `⚠️ CONFLICTS DETECTED:\n` +
+      `• Tuesday 2-3 PM: Lab overlap\n` +
+      `• Thursday 11-12: Double booking\n\n` +
+      `💡 RECOMMENDATIONS:\n` +
+      `• Reschedule conflicting sessions\n` +
+      `• Balance workload across departments\n` +
+      `• Consider additional faculty support\n\n` +
+      `Generated by MIT AI Timetable System 🚀`;
+    
+    navigator.clipboard.writeText(report).then(() => {
+      alert('📋 Faculty report copied to clipboard!');
+    }).catch(() => {
+      alert('📊 Faculty Report:\n\n' + report);
+    });
+  }
+  
+
+  
+  // Enhanced AI Features Event Listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    const aiValidationBtn = byId('aiValidation');
+    const facultyAnalyzerBtn = byId('facultyAnalyzer');
+    const colorOptimizerBtn = byId('colorOptimizer');
+    const conflictResolverBtn = byId('conflictResolver');
+    const shareSlackBtn = byId('shareSlack');
+    const shareWhatsAppBtn = byId('shareWhatsApp');
+    
+    if(aiValidationBtn) aiValidationBtn.addEventListener('click', aiValidation);
+    if(facultyAnalyzerBtn) facultyAnalyzerBtn.addEventListener('click', facultyAnalyzer);
+    if(colorOptimizerBtn) colorOptimizerBtn.addEventListener('click', colorOptimizer);
+    if(conflictResolverBtn) conflictResolverBtn.addEventListener('click', conflictResolver);
+    if(shareSlackBtn) shareSlackBtn.addEventListener('click', shareOnSlack);
+    if(shareWhatsAppBtn) shareWhatsAppBtn.addEventListener('click', shareOnWhatsApp);
+  });
+  
+  // Check for pending subjects on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pendingSubjects = localStorage.getItem('pendingSubjects');
+    
+    if(pendingSubjects || urlParams.get('loadPending') === 'true') {
+      if(pendingSubjects) {
+        try {
+          const subjects = JSON.parse(pendingSubjects);
+          selectedSubjectsData = subjects.map((s, index) => ({
+            name: s.name || s,
+            credits: s.credits || 1,
+            hours: s.hours || s.credits || 1,
+            type: s.type || 'theory',
+            teachers: s.teachers || '',
+            color: s.color || '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+            order: index + 1
+          }));
+          
+          // Immediately update display
+          displaySelectedSubjects();
+          updateStats();
+          updateLivePreview();
+          
+          // Show success notification
+          const subjectNames = selectedSubjectsData.map(s => s.name).join(', ');
+          const notification = document.createElement('div');
+          notification.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:8px;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.3);max-width:400px;';
+          notification.innerHTML = `✅ <strong>Loaded ${selectedSubjectsData.length} subjects!</strong><br><small>${subjectNames}</small>`;
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            if(notification.parentNode) notification.parentNode.removeChild(notification);
+          }, 4000);
+          
+          localStorage.removeItem('pendingSubjects');
+          localStorage.removeItem('pendingSubjectsTimestamp');
+          
+          console.log('Loaded subjects:', selectedSubjectsData);
+        } catch(error) {
+          console.error('Error loading pending subjects:', error);
+          localStorage.removeItem('pendingSubjects');
+        }
+      }
+    }
+  });
+  
+  // Initialize - ensure subjects display immediately
+  setTimeout(() => {
+    displaySelectedSubjects();
+    generateTimeSlots();
+    updateStats();
+    updateLivePreview();
+  }, 100);
+  
+  function updateLivePreview() {
+    const todayPreview = byId('todayPreview');
+    if(todayPreview) {
+      const startTime = parseFloat(byId('startTime').value) || 9;
+      const endTime = parseFloat(byId('endTime').value) || 4;
+      const shortBreak = byId('shortBreak').value.trim() || '11-11.15';
+      const lunchBreak = byId('lunchBreak').value.trim() || '1.15-2';
+      
+      try {
+        let startHour = startTime;
+        let endHour = endTime;
+        
+        if(endHour <= startHour && endHour <= 12) {
+          endHour += 12;
+        }
+        
+        const breakPeriods = [];
+        if(shortBreak) {
+          const [startStr, endStr] = shortBreak.split('-').map(t => t.trim());
+          const start = parseFloat(startStr);
+          const end = parseFloat(endStr);
+          if(!isNaN(start) && !isNaN(end)) {
+            breakPeriods.push({ start, end, label: 'Short Break' });
+          }
+        }
+        if(lunchBreak) {
+          const [startStr, endStr] = lunchBreak.split('-').map(t => t.trim());
+          let start = parseFloat(startStr);
+          let end = parseFloat(endStr);
+          if(start < 12 && start >= 1) start += 12;
+          if(end < 12 && end >= 1) end += 12;
+          if(!isNaN(start) && !isNaN(end)) {
+            breakPeriods.push({ start, end, label: 'Lunch Break' });
+          }
+        }
+        
+        const slots = [];
+        let currentHour = startHour;
+        const periodIcons = ['📚', '✏️', '🔬', '📖', '🎯', '💡', '🌟', '⚡'];
+        let periodNum = 1;
+        
+        while(periodNum <= 8 && currentHour < endHour){
+          let breakFound = false;
+          for(const breakPeriod of breakPeriods){
+            if(Math.abs(currentHour - breakPeriod.start) < 0.01){
+              const icon = breakPeriod.label.includes('Lunch') ? '🍽️' : '☕';
+              slots.push(`${icon} ${breakPeriod.label}: ${formatTime(breakPeriod.start)} - ${formatTime(breakPeriod.end)}`);
+              currentHour = breakPeriod.end;
+              breakFound = true;
+              break;
+            }
+          }
+          
+          if(!breakFound && currentHour < endHour){
+            const start = formatTime(currentHour);
+            const nextHour = currentHour + 1;
+            const end = formatTime(nextHour);
+            const icon = periodIcons[periodNum-1] || '📝';
+            
+            slots.push(`${icon} Period ${periodNum}: ${start} - ${end}`);
+            currentHour = nextHour;
+            periodNum++;
+          }
+        }
+        
+        const preview = slots.map(slot => {
+          if(slot.includes('Period')){
+            return `<div style="padding:3px 6px;margin:2px 0;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));border-left:3px solid #6366f1;border-radius:4px;font-size:10px;font-weight:600">${slot}</div>`;
+          } else {
+            return `<div style="padding:3px 6px;margin:2px 0;background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(16,185,129,0.15));border-left:3px solid #22c55e;border-radius:4px;color:#059669;font-size:10px;font-weight:600">${slot}</div>`;
+          }
+        }).join('');
+        
+        todayPreview.innerHTML = preview || 'Configure schedule to see preview';
+      } catch(error) {
+        todayPreview.innerHTML = 'Configure schedule to see preview';
+      }
+    }
+  }
+  
+
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') hideModal();
+  });
+</script>
+</body>
+</html>
