@@ -9,26 +9,81 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 25%, #f1f5f9 50%, #ffffff 100%);
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      overflow-x: hidden;
     }
-    .container {
+
+    /* Header Section */
+    .header {
       display: flex;
-      gap: 2rem;
+      align-items: center;
+      justify-content: space-between; 
+      padding: 5px 10px;
+      background: linear-gradient(135deg, #004085 0%, #003366 50%, #004085 100%);
+      border-bottom: 2px solid #002244;
+      flex-wrap: wrap;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 3px 15px rgba(0, 64, 133, 0.4);
+      width: 100%;
+      box-sizing: border-box;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo-left, .logo-right {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .logo-left img, .logo-right img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .header-text {
+      text-align: center;
+      flex: 1;
+      min-width: 280px;
+    }
+    .header-text h1 {
+      margin: 2px 0;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .header-text h1:nth-child(2) {
+      font-size: 20px;
+      margin: 3px 0;
+    }
+    .green { color: white; }
+    .orange { color: white; }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 84px;
+      padding: 0 2rem;
     }
     .tab {
       background-color: #2c3e50;
       color: #fff;
-      padding: 1rem 1.8rem;
+      padding: 1rem 1.2rem;
       border-radius: 15px;
       text-align: center;
       text-decoration: none;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: bold;
-      width: 200px;
       transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
       animation: dance 2s infinite alternate;
       position: relative;
@@ -37,11 +92,17 @@
       border: 2px solid rgba(255,255,255,0.3);
       backdrop-filter: blur(5px);
     }
-    .tab:first-child {
-      background-color: #3498db;
+    .tab:nth-child(1) {
+      background-color: #14596b;
     }
-    .tab:last-child {
-      background-color: #e74c3c;
+    .tab:nth-child(2) {
+      background-color: #b7610b;
+    }
+    .tab:nth-child(3) {
+      background-color: #0b9719;
+    }
+    .tab:nth-child(4) {
+      background-color: #077594;
     }
     .tab::before {
       content: '';
@@ -61,11 +122,17 @@
       transform: scale(1.08);
       box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
     }
-    .tab:first-child:hover {
+    .tab:nth-child(1):hover {
       background-color: #5dade2;
     }
-    .tab:last-child:hover {
-      background-color: #ec7063;
+    .tab:nth-child(2):hover {
+      background-color: #58d68d;
+    }
+    .tab:nth-child(3):hover {
+      background-color: #f7dc6f;
+    }
+    .tab:nth-child(4):hover {
+      background-color: #a569bd;
     }
     .tab:active {
       transform: scale(0.98);
@@ -96,9 +163,27 @@
   </style>
 </head>
 <body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-left">
+      <img src="left-logo.png" alt="MET Logo">
+    </div>
+    <div class="header-text">
+      <h1 class="green">🎓 Maharaja Education Trust (R), Mysuru</h1>
+      <h1 class="orange">🏛️ Maharaja Institute of Technology, Mysore</h1>
+      <h1 class="green">An Autonomous Institution Affiliated to VTU, Belagavi</h1>
+      <h1 class="orange">✅ Approved by AICTE, New Delhi | Recognized by Government of Karnataka</h1>
+    </div>
+    <div class="logo-right">
+      <img src="right-logo.png" alt="Circle Logo">
+    </div>
+  </div>
+
   <div class="container">
-    <a href="subject.htm" class="tab" id="subjectLink">Subject Database</a>
-    <a href="timetable-new.htm" class="tab" id="timetableLink">Timetable Generator</a>
+    <a href="subject.htm" class="tab" id="subjectLink">📚 Subject Database</a>
+    <a href="#" class="tab" id="facultyLink">👨‍🏫 Faculty Core</a>
+    <a href="timetable-new.htm" class="tab" id="timetableLink">📅 Timetable Generator</a>
+    <a href="#" class="tab" id="vaultLink">🗂️ Timetable Vault</a>
   </div>
 
   <script>
@@ -108,7 +193,15 @@
     
     // Update links to include department parameter
     document.getElementById('subjectLink').href = `subject.htm?dept=${encodeURIComponent(dept)}`;
+    document.getElementById('facultyLink').href = `#faculty-core?dept=${encodeURIComponent(dept)}`;
     document.getElementById('timetableLink').href = `timetable-new.htm?dept=${encodeURIComponent(dept)}`;
+    document.getElementById('vaultLink').href = `vault.htm?dept=${encodeURIComponent(dept)}`;
+    
+    // Add click handlers for Faculty Core
+    document.getElementById('facultyLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      alert('🚧 Faculty Core module coming soon!\n\nThis will include:\n• Faculty management\n• Workload distribution\n• Schedule conflicts\n• Performance analytics');
+    });
     
     for(let i=0;i<30;i++){
       const p = document.createElement('div');

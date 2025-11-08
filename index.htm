@@ -20,17 +20,34 @@
       display: flex;
       align-items: center;
       justify-content: space-between; 
-      padding: 20px;
-      background: linear-gradient(135deg, #004085 0%, #003366 50%, #004085 100%);
+      padding: 10px 0;
+      margin: 0;
+      background: linear-gradient(135deg, #06366a 0%, #05315c 50%, #033264 100%);
       border-bottom: 4px solid #002244;
       flex-wrap: wrap;
       backdrop-filter: blur(20px);
       box-shadow: 0 6px 25px rgba(0, 64, 133, 0.4);
+      width: 100vw;
+      position: relative;
+      left: 0;
+      right: 0;
     }
-    .header img {
-      max-height: 70px;
-      width: auto;
-      border-radius: 8px;
+    .logo-left, .logo-right {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    .logo-left img, .logo-right img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
     }
     .header-text {
       text-align: center;
@@ -66,6 +83,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       margin-top: 60px;
+      overflow: visible;
     }
 
     h2 {
@@ -111,21 +129,16 @@
       background-size: 12px 8px;
       cursor: pointer;
       position: relative;
+    }
+    
+    #dept {
+      position: relative;
       z-index: 1;
-      overflow: visible;
     }
     
     select option {
-      position: relative;
-      z-index: 999;
       background: white;
       color: #004085;
-      direction: ltr;
-      margin-bottom:60px;
-    }
-    
-    .container {
-      overflow: visible;
     }
     select:focus, input:focus { 
       border-color: #007BFF; 
@@ -195,14 +208,18 @@
 <body>
   <!-- Header -->
   <div class="header">
-    <img src="left-logo.png" alt="MET Logo" style="width: 100px; height: 100%; object-fit: contain;">
-    <div class="header-text">
-      <h1 class="green">Maharaja Education Trust (R), Mysuru</h1>
-      <h1 class="orange">Maharaja Institute of Technology, Mysore</h1>
-      <h1 class="green">An Autonomous Institution Affiliated to VTU, Belagavi</h1>
-      <h1 class="orange">Approved by AICTE, New Delhi | Recognized by Government of Karnataka</h1>
+    <div class="logo-left">
+      <img src="left-logo.png" alt="MET Logo">
     </div>
-    <img src="right-logo.png" alt="Circle Logo" style="width: 100px; height: 100%; object-fit: contain;">
+    <div class="header-text">
+      <h1 class="green">🎓 Maharaja Education Trust (R), Mysuru</h1>
+      <h1 class="orange">🏛️ Maharaja Institute of Technology, Mysore</h1>
+      <h1 class="green">An Autonomous Institution Affiliated to VTU, Belagavi</h1>
+      <h1 class="orange">✅ Approved by AICTE, New Delhi | Recognized by Government of Karnataka</h1>
+    </div>
+    <div class="logo-right">
+      <img src="right-logo.png" alt="Circle Logo">
+    </div>
   </div>
 
   <!-- Login / Register Container -->
@@ -290,7 +307,7 @@
     let users = JSON.parse(localStorage.getItem('registeredUsers')) || {}; // load from localStorage or empty object
 
     // Toggle between forms
-    function toggleForms() {
+    function toggleForms() { 
       if (loginForm.style.display === "none") {
         loginForm.reset();
         loginForm.style.display = "block";

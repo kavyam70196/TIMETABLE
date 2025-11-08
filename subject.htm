@@ -21,34 +21,64 @@ body {
   color: var(--primary);
   height: 100vh;
   overflow: hidden;
-  backdrop-filter: blur(10px);
 }
-header {
-  background: var(--primary);
-  color: white;
-  padding: 10px;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  padding: 5px 20px;
+  background: linear-gradient(135deg, #004085 0%, #003366 50%, #004085 100%);
+  border-bottom: 2px solid #002244;
+  flex-wrap: wrap;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 3px 15px rgba(0, 64, 133, 0.4);
+}
+.logo-left, .logo-right {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
   text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  flex-shrink: 0;
 }
+.logo-left img, .logo-right img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.header-text {
+  text-align: center;
+  flex: 1;
+  min-width: 280px;
+}
+.header-text h1 {
+  margin: 2px 0;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.2;
+}
+.header-text h1:nth-child(2) {
+  font-size: 20px;
+  margin: 3px 0;
+}
+.green { color: white; }
+.orange { color: white; }
+
 main {
   display: flex;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 84px);
   overflow: hidden;
 }
 aside {
   width: 280px;
   background: #e9ecef;
-  padding: 15px;
+  padding: 25px 15px 15px 15px;
   overflow-y: auto;
   flex-shrink: 0;
-}
-aside h3 {
-  margin-top: 0;
-  color: var(--primary);
-  font-size: 18px;
-  margin-bottom: 10px;
+  position: relative;
 }
 aside label {
   font-weight: bold;
@@ -59,12 +89,14 @@ aside label {
 }
 aside select, aside input {
   width: 100%;
+  height: 40px;
   padding: 8px;
   font-size: 14px;
-  border-radius: 6px;
+  border-radius: 20px;
   border: 1px solid var(--primary);
   margin-bottom: 8px;
   color: var(--primary);
+  box-sizing: border-box;
 }
 aside button {
   width: 100%;
@@ -77,15 +109,9 @@ aside button {
   color: white;
 }
 #addBtn { background: var(--info); }
-#addBtn:hover { background: #138496; }
-#saveBtn { background: var(--primary); }
-#saveBtn:hover { background: #0056b3; }
+#saveBtn { background: var(--success); }
 #viewDbBtn { background: var(--medium-blue); }
-#viewDbBtn:hover { background: var(--primary); }
-#exportBtn { background: var(--success); }
-#exportBtn:hover { background: #218838; }
 #clearBtn { background: var(--danger); }
-#clearBtn:hover { background: #c82333; }
 
 .stats-box {
   background: white;
@@ -110,6 +136,16 @@ section {
   padding: 15px;
   overflow-y: auto;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.table-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 300px);
+  border: 1px solid rgba(0,64,133,0.2);
+  border-radius: 8px;
+  background: white;
 }
 section h2 {
   font-size: 20px;
@@ -117,11 +153,17 @@ section h2 {
   margin-bottom: 10px;
 }
 
-/* Subjects Table */
 #subjectsTable {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 6px;
+  margin: 0;
+}
+#subjectsTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
 }
 #subjectsTable thead tr {
   background: var(--light-grey);
@@ -142,6 +184,8 @@ section h2 {
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 14px;
+  border: none;
+  cursor: pointer;
 }
 .editBtn { background: var(--info); color: white; }
 .delBtn { background: var(--danger); color: white; }
@@ -161,7 +205,6 @@ section h2 {
   font-size: 14px;
 }
 
-/* Database Popup */
 #dbOverlay {
   display: none;
   position: fixed;
@@ -201,85 +244,245 @@ section h2 {
   cursor: pointer;
   margin-left: 10px;
 }
+
 #dbContent {
-  margin-top: 15px;
+  max-width: 1200px;
+  margin: 0;
+  padding: 20px;
+  text-align: left;
 }
+
 .year-folder {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   border: 2px solid var(--primary);
-  border-radius: 8px;
-  background: white;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 8px 25px rgba(0,64,133,0.12), 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
+
+.year-folder:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0,64,133,0.18), 0 6px 15px rgba(0,0,0,0.08);
+}
+
 .folder-header {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, #0056b3 50%, #003d82 100%);
   color: white;
-  padding: 12px;
+  padding: 20px 25px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  font-size: 18px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
-.folder-header:hover {
-  background: #0056b3;
+
+.folder-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
 }
+
+.folder-header:hover::before {
+  left: 100%;
+}
+
+.folder-header::after {
+  content: '▼';
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.folder-header.collapsed::after {
+  transform: rotate(-90deg);
+}
+
+.folder-stats {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
 .folder-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 25px;
+  background: linear-gradient(145deg, #fafbfc 0%, #f1f3f5 100%);
+  align-items: start;
+  justify-content: start;
 }
+
 .db-section {
-  flex: 1 1 180px;
-  max-width: 200px;
-  background: linear-gradient(135deg,#e0f0ff,#ffffff);
-  padding: 8px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fbff 50%, #ffffff 100%);
+  padding: 0;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,64,133,0.2);
-  font-size: 12px;
-  max-height: 250px;
-  overflow-y: auto;
-  border: 1px solid var(--primary);
+  box-shadow: 0 3px 10px rgba(0,64,133,0.08), 0 1px 4px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,64,133,0.12);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.db-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,64,133,0.15), 0 4px 12px rgba(0,0,0,0.08);
+  border-color: var(--primary);
 }
 
 .db-section h3 {
   font-size: 12px;
-  margin: 0 0 4px 0;
+  margin: 0;
   color: white;
-  background: var(--primary);
-  padding: 4px;
-  border-radius: 4px 4px 0 0;
+  background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%);
+  padding: 8px 12px;
   text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 4px rgba(0,64,133,0.15);
+  position: relative;
 }
+
+.db-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px;
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  max-height: 120px;
+}
+
 .db-section table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 5px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
 }
-.db-section table th,
-.db-section table td {
-  border: 1px solid #ccc;
-  padding: 3px 4px;
-  font-size: 11px;
+
+.db-section table th {
+  background: linear-gradient(135deg, rgba(0,64,133,0.08) 0%, rgba(0,64,133,0.05) 100%);
   color: var(--primary);
+  font-weight: 600;
+  padding: 10px 8px;
   text-align: left;
-}
-.db-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-}
-.db-actions button {
-  padding: 3px 6px;
+  border-bottom: 2px solid rgba(0,64,133,0.1);
   font-size: 11px;
-  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.db-section table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(0,64,133,0.05);
+  color: var(--primary);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.db-section table tr:hover {
+  background: rgba(0,64,133,0.03);
+}
+
+.subject-name {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.credits-badge {
+  background: linear-gradient(135deg, var(--info) 0%, #0056b3 100%);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 25px;
+  display: inline-block;
+}
+
+.type-badge {
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.type-theory { background: #e3f2fd; color: #1565c0; }
+.type-lab { background: #f3e5f5; color: #7b1fa2; }
+.type-mcq { background: #e8f5e8; color: #2e7d32; }
+.type-free { background: #fff3e0; color: #ef6c00; }
+
+.db-actions {
+  padding: 6px 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
+  border-top: 1px solid rgba(0,64,133,0.1);
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.db-actions button {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
 }
-.useBtn { background: var(--primary); color: white; }
-.delBtn { background: var(--danger); color: white; }
 
-/* Toast */
+.db-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.useBtn { 
+  background: linear-gradient(135deg, var(--primary) 0%, #0056b3 100%); 
+  color: white; 
+}
+
+.delBtn { 
+  background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%); 
+  color: white; 
+}
+
+.semester-count {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 #toast {
   position: fixed;
   bottom: 20px; right: 20px;
@@ -290,29 +493,38 @@ section h2 {
   display: none;
   z-index: 2000;
 }
-
-.hidden { display: none !important; }
 </style>
 </head>
 <body>
-<header>
-  <div style="display: flex; align-items: center; justify-content: space-between;">
-    <a href="page.htm" style="color: white; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 6px; font-size: 14px;">← Back</a>
-    <span id="headerTitle">📘 Subject Database</span>
-    <div style="width: 80px;"></div>
+  <div class="header">
+    <div class="logo-left">
+      <img src="left-logo.png" alt="MET Logo">
+    </div>
+    <div class="header-text">
+      <h1 class="green">🎓 Maharaja Education Trust (R), Mysuru</h1>
+      <h1 class="orange">🏛️ Maharaja Institute of Technology, Mysore</h1>
+      <h1 class="green">An Autonomous Institution Affiliated to VTU, Belagavi</h1>
+      <h1 class="orange">✅ Approved by AICTE, New Delhi | Recognized by Government of Karnataka</h1>
+    </div>
+    <div class="logo-right">
+      <img src="right-logo.png" alt="Circle Logo">
+    </div>
   </div>
-</header>
+
 <main>
   <aside>
-    <h3>Controls</h3>
+    <button id="backBtn" style="position: absolute; top: 5px; left: 5px; background: white; color: var(--primary); border: 1px solid var(--primary); padding: 4px 8px; font-size: 14px; border-radius: 8px; z-index: 10; width: auto;">← Back</button>
+    
     <label>Academic Year:</label>
-    <input type="text" id="academicYearInput" placeholder="e.g. 2024-25">
+    <input type="text" id="academicYearInput" placeholder="EG:2024-25">
 
     <label>Year:</label>
     <select id="yearSelect">
       <option value="">--Select--</option>
-      <option>1</option><option>2</option>
-      <option>3</option><option>4</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
     </select>
 
     <label>Semester:</label>
@@ -337,9 +549,7 @@ section h2 {
     <button id="addBtn">Add Subject</button>
     <button id="saveBtn">💾 Save Database</button>
     <button id="viewDbBtn">📂 View Database</button>
-    <button id="exportBtn">📤 Export Data</button>
     <button id="clearBtn">🗑️ Clear All</button>
-    <button id="viewTimetablesBtn" style="background: var(--warning); color: var(--primary);">📅 View Timetables</button>
 
     <div class="stats-box">
       <h4>Statistics</h4>
@@ -368,22 +578,23 @@ section h2 {
       <span id="selectedCount">0 selected</span>
     </div>
 
-    <table id="subjectsTable">
-      <thead>
-        <tr>
-          <th><input type="checkbox" id="masterCheckbox"></th>
-          <th>Subject</th>
-          <th>Credits</th>
-          <th>Type</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-container">
+      <table id="subjectsTable">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="masterCheckbox"></th>
+            <th>Subject</th>
+            <th>Credits</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </section>
 </main>
 
-<!-- Database Popup -->
 <div id="dbOverlay">
   <div id="dbBox">
     <button id="dbClose">Close</button>
@@ -396,14 +607,12 @@ section h2 {
 <div id="toast"></div>
 
 <script>
-// Get department from URL or localStorage
 const urlParams = new URLSearchParams(window.location.search);
 const currentDepartment = urlParams.get('dept') || localStorage.getItem('currentDepartment') || 'ISE';
 const storageKey = `subjectsData_${currentDepartment}`;
 
 let subjectsData = JSON.parse(localStorage.getItem(storageKey)||'{}');
 let currentAcademicYear = '', currentYear = '', currentSemester = '', currentSubjects = [];
-let filteredSubjects = [];
 let selectedSubjects = new Set();
 
 // DOM elements
@@ -414,21 +623,20 @@ const subjectInput = document.getElementById('subjectInput');
 const addBtn = document.getElementById('addBtn');
 const saveBtn = document.getElementById('saveBtn');
 const viewDbBtn = document.getElementById('viewDbBtn');
-const exportBtn = document.getElementById('exportBtn');
 const clearBtn = document.getElementById('clearBtn');
 const selectAllBtn = document.getElementById('selectAllBtn');
 const clearSelectionBtn = document.getElementById('clearSelectionBtn');
 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 const masterCheckbox = document.getElementById('masterCheckbox');
-const viewTimetablesBtn = document.getElementById('viewTimetablesBtn');
 const subjectsTable = document.querySelector('#subjectsTable tbody');
 const dbOverlay = document.getElementById('dbOverlay');
 const dbClose = document.getElementById('dbClose');
 const dbContent = document.getElementById('dbContent');
 const toast = document.getElementById('toast');
+const backBtn = document.getElementById('backBtn');
 
-// Display current department
-document.getElementById('headerTitle').textContent = `📘 Subject Database - ${currentDepartment}`;
+// Back button
+backBtn.onclick = () => window.location.href = 'page.htm';
 
 // Update statistics
 function updateStats(){
@@ -485,9 +693,8 @@ semesterSelect.onchange = () => {
 function renderTable(){
   subjectsTable.innerHTML = '';
   selectedSubjects.clear();
-  filteredSubjects = currentSubjects;
   
-  filteredSubjects.forEach((sub,i)=>{
+  currentSubjects.forEach((sub,i)=>{
     const tr = document.createElement('tr');
     const name = typeof sub === 'object' ? escapeHtml(sub.name) : escapeHtml(sub);
     const credits = typeof sub === 'object' ? (sub.credits || 1) : 1;
@@ -497,7 +704,7 @@ function renderTable(){
       <td><input type="checkbox" class="subject-checkbox" data-i="${i}"></td>
       <td>${name}</td>
       <td>${credits}</td>
-      <td style="width:80px"><span style="background:var(--info);color:white;padding:2px 6px;border-radius:4px;font-size:11px;display:inline-block;width:60px;text-align:center">${type}</span></td>
+      <td><span style="background:var(--info);color:white;padding:2px 6px;border-radius:4px;font-size:11px;">${type}</span></td>
       <td class="actions">
         <button class="editBtn" data-i="${i}">Edit</button>
         <button class="delBtn" data-i="${i}">Delete</button>
@@ -509,13 +716,12 @@ function renderTable(){
   updateSelectionCount();
 }
 
-// Attach event listeners to table rows
+// Attach event listeners
 function attachRowEvents(){
   document.querySelectorAll('.editBtn').forEach(btn=>{
     btn.onclick=()=>{
       const i=btn.dataset.i;
-      const originalIndex = currentSubjects.indexOf(filteredSubjects[i]);
-      const subject = filteredSubjects[i];
+      const subject = currentSubjects[i];
       const currentName = subject.name || subject;
       const currentCredits = subject.credits || 1;
       const currentType = subject.type || 'theory';
@@ -550,15 +756,10 @@ function attachRowEvents(){
         const newType = document.getElementById('editType').value;
         
         if(newName){
-          if(typeof currentSubjects[originalIndex] === 'object'){
-            currentSubjects[originalIndex].name = newName;
-            currentSubjects[originalIndex].credits = newCredits;
-            currentSubjects[originalIndex].type = newType;
-          } else {
-            currentSubjects[originalIndex] = {name: newName, credits: newCredits, type: newType};
-          }
+          currentSubjects[i] = {name: newName, credits: newCredits, type: newType};
           renderTable();
-          showToast("Subject updated","#28a745");
+          autoSave(); // Auto-save after editing
+          showToast("Subject updated and saved automatically","#28a745");
         }
         document.body.removeChild(editForm);
       };
@@ -568,12 +769,12 @@ function attachRowEvents(){
   document.querySelectorAll('.delBtn').forEach(btn=>{
     btn.onclick=()=>{
       const i=btn.dataset.i;
-      const originalIndex = currentSubjects.indexOf(filteredSubjects[i]);
-      const subjectName = filteredSubjects[i].name || filteredSubjects[i];
+      const subjectName = currentSubjects[i].name || currentSubjects[i];
       if(confirm(`Delete "${subjectName}" permanently?`)){
-        currentSubjects.splice(originalIndex,1);
+        currentSubjects.splice(i,1);
         renderTable();
-        showToast("Subject deleted","#dc3545");
+        autoSave(); // Auto-save after deleting
+        showToast("Subject deleted and saved automatically","#dc3545");
       }
     };
   });
@@ -614,13 +815,11 @@ deleteSelectedBtn.onclick = () => {
     return;
   }
   if(confirm(`Delete ${selectedSubjects.size} selected subjects?`)){
-    const indicesToDelete = Array.from(selectedSubjects).map(i => 
-      currentSubjects.indexOf(filteredSubjects[i])
-    ).sort((a,b) => b-a);
-    
+    const indicesToDelete = Array.from(selectedSubjects).map(i => parseInt(i)).sort((a,b) => b-a);
     indicesToDelete.forEach(index => currentSubjects.splice(index, 1));
     renderTable();
-    showToast(`${selectedSubjects.size} subjects deleted`,"#dc3545");
+    autoSave(); // Auto-save after bulk delete
+    showToast(`${selectedSubjects.size} subjects deleted and saved automatically`,"#dc3545");
   }
 };
 
@@ -647,13 +846,14 @@ addBtn.onclick=()=>{
   const credits = parseInt(document.getElementById('creditsInput').value) || 1;
   const type = document.getElementById('typeInput').value;
   
+  // Only check for duplicates within the SAME academic year, year, and semester
   const exists = currentSubjects.some(sub => {
     const name = sub.name || sub;
     return name.toLowerCase() === subjectName.toLowerCase();
   });
   
   if(exists){
-    showToast("Subject already exists","#dc3545");
+    showToast("Subject already exists in this semester","#dc3545");
     return;
   }
   
@@ -662,9 +862,22 @@ addBtn.onclick=()=>{
   document.getElementById('creditsInput').value='1';
   document.getElementById('typeInput').value='theory';
   renderTable();
+  autoSave(); // Auto-save after adding
   updateStats();
-  showToast("Subject added - Click Save to store permanently","#28a745");
+  showToast("Subject added and saved automatically","#28a745");
 };
+
+// Auto-save function
+function autoSave(){
+  currentAcademicYear = academicYearInput.value.trim();
+  if(currentAcademicYear && currentYear && currentSemester && currentSubjects.length > 0){
+    if(!subjectsData[currentAcademicYear]) subjectsData[currentAcademicYear]={};
+    if(!subjectsData[currentAcademicYear][currentYear]) subjectsData[currentAcademicYear][currentYear]={};
+    subjectsData[currentAcademicYear][currentYear][currentSemester]=[...currentSubjects];
+    localStorage.setItem(storageKey, JSON.stringify(subjectsData));
+    updateStats();
+  }
+}
 
 // Save database
 saveBtn.onclick=()=>{
@@ -673,31 +886,11 @@ saveBtn.onclick=()=>{
   if(!currentYear || !currentSemester){ showToast("Select Year & Semester","#dc3545"); return; }
   if(currentSubjects.length === 0){ showToast("No subjects to save","#dc3545"); return; }
   
-  if(!subjectsData[currentAcademicYear]) subjectsData[currentAcademicYear]={};
-  if(!subjectsData[currentAcademicYear][currentYear]) subjectsData[currentAcademicYear][currentYear]={};
-  subjectsData[currentAcademicYear][currentYear][currentSemester]=currentSubjects;
-  
-  localStorage.setItem(storageKey, JSON.stringify(subjectsData));
-  
+  autoSave();
+  currentSubjects = [];
+  renderTable();
   updateStats();
   showToast(`Database saved for ${currentDepartment}`,"#28a745");
-};
-
-// Export functionality
-exportBtn.onclick = () => {
-  if(Object.keys(subjectsData).length === 0){
-    showToast("No data to export","#dc3545");
-    return;
-  }
-  const dataStr = JSON.stringify(subjectsData, null, 2);
-  const dataBlob = new Blob([dataStr], {type: 'application/json'});
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `subjects_${currentDepartment}_${new Date().toISOString().split('T')[0]}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast("Data exported","#28a745");
 };
 
 // Clear all data
@@ -712,162 +905,109 @@ clearBtn.onclick = () => {
   }
 };
 
-// View Database functionality
+// View Database
 viewDbBtn.onclick = () => {
   dbContent.innerHTML='';
   
   if(Object.keys(subjectsData).length===0){
-    dbContent.innerHTML='<p style="text-align:center;padding:20px;font-size:16px;color:#666;">No data saved yet. Add subjects and save to see them here.</p>';
-  } else {
-    for(const ay in subjectsData){
-      const yearFolder = document.createElement('div');
-      yearFolder.className = 'year-folder';
-      
-      const folderHeader = document.createElement('div');
-      folderHeader.className = 'folder-header';
-      folderHeader.innerHTML = `📂 ${ay}`;
-      
-      const folderContent = document.createElement('div');
-      folderContent.className = 'folder-content';
-      folderContent.style.display = 'flex';
-      
-      folderHeader.onclick = function(){
-        if(folderContent.style.display === 'none'){
-          folderContent.style.display = 'flex';
-          folderHeader.innerHTML = `📂 ${ay}`;
-        } else {
-          folderContent.style.display = 'none';
-          folderHeader.innerHTML = `📁 ${ay}`;
-        }
-      };
-      
-      for(const y in subjectsData[ay]){
-        for(const s in subjectsData[ay][y]){
-          const list=subjectsData[ay][y][s];
-          if(list && list.length > 0){
-            const section=document.createElement('div');
-            section.className="db-section";
-            section.innerHTML=`
-              <h3>Year ${y} - Semester ${s} (${list.length} subjects)</h3>
-              <table>
-                <tr><th>Subject</th><th>Credits</th><th>Type</th></tr>
-                ${list.map(sub=>{
-                  const name = escapeHtml(sub.name || sub);
-                  const credits = sub.credits || 1;
-                  const type = sub.type || 'theory';
-                  return `<tr><td>${name}</td><td>${credits}</td><td>${type}</td></tr>`;
-                }).join('')}
-              </table>
-              <div class="db-actions">
-                <button class="useBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">✅ Use</button>
-                <button class="delBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">🗑️ Delete</button>
-              </div>
-            `;
-            folderContent.appendChild(section);
-          }
-        }
-      }
-      
-      yearFolder.appendChild(folderHeader);
-      yearFolder.appendChild(folderContent);
-      dbContent.appendChild(yearFolder);
-    }
-    
-    // Attach event listeners to Use and Delete buttons
-    dbContent.querySelectorAll('.useBtn').forEach(btn=>{
-      btn.onclick = function(){
-        const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
-        const subjects = subjectsData[ay][y][s] || [];
-        
-        // Check if we came from timetable generator
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('fromTimetable') === 'true') {
-          // Redirect to timetable view database
-          if(window.opener){
-            window.opener.postMessage({
-              type: 'SUBJECTS_SELECTED',
-              subjects: subjects
-            }, '*');
-            setTimeout(() => window.close(), 500);
-          } else {
-            window.location.href = `timetable-new.htm?dept=${currentDepartment}&directTimetables=true`;
-          }
-        } else {
-          // Load subjects locally in subject database
-          academicYearInput.value=ay;
-          yearSelect.value=y; yearSelect.onchange();
-          semesterSelect.value=s; semesterSelect.onchange();
-          dbOverlay.style.display='none';
-          showToast(`Loaded ${ay} Year ${y}, Sem ${s}`,"#28a745");
-        }
-      };
-    });
-    
-    dbContent.querySelectorAll('.delBtn').forEach(btn=>{
-      btn.onclick = function(){
-        const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
-        if(confirm(`Delete ${ay} Year ${y}, Sem ${s}?`)){
-          delete subjectsData[ay][y][s];
-          if(Object.keys(subjectsData[ay][y]).length===0) delete subjectsData[ay][y];
-          if(Object.keys(subjectsData[ay]).length===0) delete subjectsData[ay];
-          localStorage.setItem(storageKey, JSON.stringify(subjectsData));
-          btn.closest('.db-section').remove();
-          updateStats();
-          showToast(`Deleted ${ay} Year ${y}, Sem ${s}`,"#dc3545");
-        }
-      };
-    });
-  }
-  
-  dbOverlay.style.display='block';
-};
-
-// Close database overlay
-dbClose.onclick = () => {
-  dbOverlay.style.display='none';
-};
-
-// View Timetables functionality
-viewTimetablesBtn.onclick = () => {
-  const timetableStorageKey = `timetableData_${currentDepartment}`;
-  const timetables = JSON.parse(localStorage.getItem(timetableStorageKey) || '{}');
-  
-  if (Object.keys(timetables).length === 0) {
-    showToast(`No timetables saved for ${currentDepartment}`, "#dc3545");
+    dbContent.innerHTML=`
+      <div style="text-align:center;padding:60px 20px;">
+        <div style="font-size:48px;margin-bottom:20px;opacity:0.3;">📚</div>
+        <h3 style="color:var(--primary);margin-bottom:10px;">No Subjects Database Found</h3>
+        <p style="color:#666;font-size:16px;margin-bottom:30px;">Start by adding subjects and saving them to build your database.</p>
+        <div style="background:linear-gradient(135deg,#f8fafc 0%,#e9ecef 100%);padding:20px;border-radius:12px;border:2px dashed #ddd;">
+          <p style="color:#888;font-size:14px;margin:0;">💡 Tip: Organize subjects by Academic Year → Year → Semester for easy management</p>
+        </div>
+      </div>
+    `;
+    dbOverlay.style.display='block';
     return;
   }
   
-  dbContent.innerHTML = '';
-  
-  for (const ay in timetables) {
-    const yearData = timetables[ay];
+  for(const ay in subjectsData){
     const yearFolder = document.createElement('div');
     yearFolder.className = 'year-folder';
     
     const folderHeader = document.createElement('div');
     folderHeader.className = 'folder-header';
-    folderHeader.innerHTML = `📂 ${ay} Timetables`;
+    folderHeader.innerHTML = `📂 ${ay}`;
     
     const folderContent = document.createElement('div');
     folderContent.className = 'folder-content';
-    folderContent.style.display = 'flex';
+    folderContent.style.display = 'none';
     
-    if (yearData.timetables && yearData.timetables.length > 0) {
-      yearData.timetables.forEach((tt, index) => {
-        const section = document.createElement('div');
-        section.className = 'db-section';
-        section.innerHTML = `
-          <h3>${tt.className} - ${tt.roomNumber || 'N/A'}</h3>
-          <div style="font-size: 11px; margin: 5px 0;">
-            <div><strong>Created:</strong> ${new Date(yearData.savedAt).toLocaleDateString()}</div>
-            <div><strong>Department:</strong> ${yearData.department}</div>
-          </div>
-          <div class="db-actions">
-            <button class="useBtn" onclick="window.location.href='timetable-new.htm?dept=${currentDepartment}&showTimetables=true'" style="background: var(--warning); color: var(--primary);">📚 Use</button>
-          </div>
-        `;
-        folderContent.appendChild(section);
-      });
+    // Count total subjects in this academic year
+    let totalSubjectsInYear = 0;
+    let totalSemesters = 0;
+    for(const y in subjectsData[ay]){
+      for(const s in subjectsData[ay][y]){
+        if(subjectsData[ay][y][s] && subjectsData[ay][y][s].length > 0){
+          totalSubjectsInYear += subjectsData[ay][y][s].length;
+          totalSemesters++;
+        }
+      }
+    }
+    
+    folderHeader.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 20px;">📂</span>
+        <span>${ay}</span>
+      </div>
+      <div class="folder-stats">
+        <span class="semester-count">${totalSemesters} Semesters</span>
+        <span class="semester-count" style="margin-left: 8px;">${totalSubjectsInYear} Subjects</span>
+      </div>
+    `;
+    
+    folderHeader.classList.add('collapsed');
+    folderHeader.onclick = function(){
+      const isCollapsed = folderContent.style.display === 'none';
+      if(isCollapsed){
+        folderContent.style.display = 'grid';
+        folderHeader.classList.remove('collapsed');
+      } else {
+        folderContent.style.display = 'none';
+        folderHeader.classList.add('collapsed');
+      }
+    };
+    
+    for(const y in subjectsData[ay]){
+      for(const s in subjectsData[ay][y]){
+        const list=subjectsData[ay][y][s];
+        if(list && list.length > 0){
+          const section=document.createElement('div');
+          section.className="db-section";
+          section.innerHTML=`
+            <h3>Year ${y} - Semester ${s} (${list.length} subjects)</h3>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr><th>Subject</th><th>Credits</th><th>Type</th></tr>
+                </thead>
+                <tbody>
+                  ${list.slice(0,5).map(sub=>{
+                    const name = escapeHtml(sub.name || sub);
+                    const credits = sub.credits || 1;
+                    const type = sub.type || 'theory';
+                    return `
+                      <tr>
+                        <td class="subject-name">${name}</td>
+                        <td><span class="credits-badge">${credits}</span></td>
+                        <td><span class="type-badge type-${type}">${type}</span></td>
+                      </tr>
+                    `;
+                  }).join('')}${list.length > 5 ? `<tr><td colspan="3" style="text-align:center;color:#666;font-style:italic;padding:8px;">... and ${list.length - 5} more subjects</td></tr>` : ''}
+                </tbody>
+              </table>
+            </div>
+            <div class="db-actions">
+              <button class="useBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">✅ Load</button>
+              <button class="delBtn" data-ay="${ay}" data-y="${y}" data-s="${s}">🗑️ Delete</button>
+            </div>
+          `;
+          folderContent.appendChild(section);
+        }
+      }
     }
     
     yearFolder.appendChild(folderHeader);
@@ -875,7 +1015,39 @@ viewTimetablesBtn.onclick = () => {
     dbContent.appendChild(yearFolder);
   }
   
-  dbOverlay.style.display = 'block';
+  // Attach event listeners
+  dbContent.querySelectorAll('.useBtn').forEach(btn=>{
+    btn.onclick = function(){
+      const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
+      academicYearInput.value=ay;
+      yearSelect.value=y; yearSelect.onchange();
+      semesterSelect.value=s; semesterSelect.onchange();
+      dbOverlay.style.display='none';
+      showToast(`Loaded ${ay} Year ${y}, Sem ${s}`,"#28a745");
+    };
+  });
+  
+  dbContent.querySelectorAll('.delBtn').forEach(btn=>{
+    btn.onclick = function(){
+      const ay=btn.dataset.ay, y=btn.dataset.y, s=btn.dataset.s;
+      if(confirm(`Delete ${ay} Year ${y}, Sem ${s}?`)){
+        delete subjectsData[ay][y][s];
+        if(Object.keys(subjectsData[ay][y]).length===0) delete subjectsData[ay][y];
+        if(Object.keys(subjectsData[ay]).length===0) delete subjectsData[ay];
+        localStorage.setItem(storageKey, JSON.stringify(subjectsData));
+        btn.closest('.db-section').remove();
+        updateStats();
+        showToast(`Deleted ${ay} Year ${y}, Sem ${s}`,"#dc3545");
+      }
+    };
+  });
+  
+  dbOverlay.style.display='block';
+};
+
+// Close database overlay
+dbClose.onclick = () => {
+  dbOverlay.style.display='none';
 };
 
 // Go to timetable generator
@@ -893,18 +1065,11 @@ function showToast(msg,color){
 
 function escapeHtml(txt){
   if(!txt) return '';
-  return txt.toString().replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+  return txt.toString().replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
 
 // Initialize
 updateStats();
-
-// Auto-show database if parameter is present
-if(urlParams.get('autoShowDb') === 'true') {
-  setTimeout(() => {
-    viewDbBtn.click();
-  }, 500);
-}
 </script>
 </body>
 </html>
